@@ -58,5 +58,6 @@ $ sudo swapoff /swapfile
 * jetpack 3.2 choose r1.9
 * python 2.7
 ```shell
+$ sudo apt install python-pip
 $ sudo pip install tensorflow-1.9.0rc0-cp27-cp27mu-linux_aarch64.whl
 ```
