@@ -8,6 +8,7 @@
 >  rename.py
 3. update `testing.txt`, copy from `testing/image_2/testing.txt`
 > prepare_testing_file.py
+
 ------
 # runwaydetection 'incl'
 ```shell
@@ -17,29 +18,34 @@ $ ln -s ../submodules/evaluation/kitti_devkit/ seg_utils
 $ ln -s ../submodules/evaluation/ evaluation
 $ ln -s ../submodules/TensorVision/tensorvision tensorvision
 ```
+
 ------
 ## Nvidia TX2 install
 # sudo pip install -r requirements.txt error
 ```shell
 $ sudo apt-get install libjpeg-dev zlib1g-dev
 $ apt-get install libatlas-base-dev 
-
 ```
+
 ------
 # OpenCV compile with python
 ##1 cmake-qt-gui
 * http://ports.ubuntu.com/ubuntu-ports/pool/universe/c/cmake/
+
 ##2 cmake ../
 * exe: /usr/bin/python2.7
 * include: /usr/include/python2.7
 * lib: /usr/lib/aarch64-linux-gnu/libpython2.7.so
 * num_include: /usr/local/lib/python2.7/dist-packages/numpy/core/include
+
 ##3 copy
+
 ------
 # enable all of the CPU cores (6 core) on TX2
 ```python
 $ sudo nvpmodel -m 0
 ```
+
 ------
 # swap GB
 [swap](https://www.cnblogs.com/EasonJim/p/7487596.html)
@@ -54,6 +60,7 @@ $ sudo vim /etc/fstab
 > /swapfile none swap sw 0 0
 $ sudo swapoff /swapfile
 ```
+
 ------
 # tx2 install tensorflow
 * [pip install tf](https://devtalk.nvidia.com/default/topic/1031300/jetson-tx2/tensorflow-1-8-wheel-with-jetpack-3-2-/)
