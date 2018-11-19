@@ -10,26 +10,16 @@
 > prepare_testing_file.py
 
 ------
-# runwaydetection 'incl'
-```shell
-$ mkdir incl
-$ ln -s ../submodules/tensorflow-fcn/ tensorflow_fcn
-$ ln -s ../submodules/evaluation/kitti_devkit/ seg_utils
-$ ln -s ../submodules/evaluation/ evaluation
-$ ln -s ../submodules/TensorVision/tensorvision tensorvision
-```
-
-------
-## Nvidia TX2 install
-# sudo pip install -r requirements.txt error
+# Nvidia TX2 install
+## sudo pip install -r requirements.txt error
 ```shell
 $ sudo apt-get install libjpeg-dev zlib1g-dev
-$ apt-get install libatlas-base-dev 
+$ sudo apt-get install libatlas-base-dev
 ```
 
 ------
 # OpenCV compile with python
-##1 cmake-qt-gui
+##1 intall cmake-qt-gui
 * http://ports.ubuntu.com/ubuntu-ports/pool/universe/c/cmake/
 
 ##2 cmake ../
@@ -71,3 +61,23 @@ $ sudo apt install python-pip
 $ pip install --upgrade pip
 $ sudo pip install tensorflow-1.9.0rc0-cp27-cp27mu-linux_aarch64.whl
 ```
+
+------
+# runWayDetection setup step
+# 1.runwaydetection 'incl'
+```shell
+$ mkdir incl
+$ cd incl
+$ ln -s ../submodules/tensorflow-fcn/ tensorflow_fcn
+$ ln -s ../submodules/evaluation/kitti_devkit/ seg_utils
+$ ln -s ../submodules/evaluation/ evaluation
+$ ln -s ../submodules/TensorVision/tensorvision tensorvision
+```
+# 2. install requirements
+```shell
+$ sudo apt-get install libjpeg-dev zlib1g-dev 
+$ sudo apt-get install libatlas-base-dev 
+$ sudo apt-get install libpng-dev libfreetype6-dev # matplotlib depedencies.
+$ sudo pip install -r requirements.txt
+```
+
