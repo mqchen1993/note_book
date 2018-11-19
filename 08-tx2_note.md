@@ -28,7 +28,7 @@ $ apt-get install libatlas-base-dev
 ------
 # OpenCV compile with python
 ##1 cmake-qt-gui
-http://ports.ubuntu.com/ubuntu-ports/pool/universe/c/cmake/
+* http://ports.ubuntu.com/ubuntu-ports/pool/universe/c/cmake/
 ##2 cmake ../
 * exe: /usr/bin/python2.7
 * include: /usr/include/python2.7
@@ -37,7 +37,9 @@ http://ports.ubuntu.com/ubuntu-ports/pool/universe/c/cmake/
 ##3 copy
 ------
 # enable all of the CPU cores (6 core) on TX2
+```python
 $ sudo nvpmodel -m 0
+```
 ------
 # swap GB
 [swap](https://www.cnblogs.com/EasonJim/p/7487596.html)
