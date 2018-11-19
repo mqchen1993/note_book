@@ -42,7 +42,7 @@ $ apt-get install libatlas-base-dev
 
 ------
 # enable all of the CPU cores (6 core) on TX2
-```python
+```shell
 $ sudo nvpmodel -m 0
 ```
 
@@ -68,5 +68,6 @@ $ sudo swapoff /swapfile
 * python 2.7
 ```shell
 $ sudo apt install python-pip
+$ pip install --upgrade pip
 $ sudo pip install tensorflow-1.9.0rc0-cp27-cp27mu-linux_aarch64.whl
 ```
