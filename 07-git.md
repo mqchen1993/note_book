@@ -27,7 +27,7 @@ $ sudo vim /etc/hosts
 ```
 Add:
 ```python
-$ # jun-pc github
+# jun-pc github
 192.168.1.110 	jun-git
 ```
 
