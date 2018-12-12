@@ -63,3 +63,28 @@ eth0: 10.42.0.1
 # install x11vnc
 https://blog.csdn.net/longhr/article/details/51657610
 https://blog.csdn.net/styshoo/article/details/52706138
+
+# ssh IPV6 
+ssh -6 jun@fe80::3640:fb18:95b0:a93%enp3s0
+
+# linux cutecom
+## install cutecom
+```shell
+$ sudo apt-get install cutecom
+```
+## install xgcom
+* http://code.google.com/p/xgcom/ 下载xgcom源代码. 最新版本为 xgcom-0.04.2.tgz.
+* install dependence.
+```shell
+$ sudo apt-get install automake
+$ sudo apt-get install libglib2.0-dev
+$ sudo apt-get install libvte-dev
+$ sudo apt-get install libgtk2.0-dev
+```
+* build xgcom
+```shell
+$ ./autogen.sh
+$ make
+$ sudo make install
+```
+
