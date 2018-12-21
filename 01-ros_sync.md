@@ -88,3 +88,35 @@ $ make
 $ sudo make install
 ```
 
+# nvidia GPU FAN PWM
+## 1.设置多显卡降温
+```shell
+$ nvidia-xconfig --enable-all-gpus
+```
+## 2. xorg.conf
+```shell
+$ cd /etc/X11
+$ cp -p xorg.conf xorg.conf.origin
+$ sudo vim xorg.conf
+# 找到”Section Device” 这2块,添加： Option “Coolbits” “4”
+Section "Device"
+    Identifier     "Device0"
+    Driver         "nvidia"
+    VendorName     "NVIDIA Corporation"
+    BoardName      "GeForce GTX 1080 Ti"
+    BusID          "PCI:1:0:0"
+    `Option         "Coolbits" "4"`
+EndSection
+```
+## 3. 设置主GPU
+```shell
+Section "ServerLayout"
+    Identifier     "Layout0"
+    Screen      0  "Screen0" RightOf "Screen1"
+    Screen      1  "Screen1" 
+    InputDevice    "Keyboard0" "CoreKeyboard"
+    InputDevice    "Mouse0" "CorePointer"
+EndSection
+```
+## 重启机器
+

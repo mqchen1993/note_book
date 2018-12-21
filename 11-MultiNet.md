@@ -16,7 +16,11 @@ $ python train.py --hypes hypes/multinet2.json
 ```
 ---
 
-# 3. File directories.
+# 3. Blog
+[blog.csdn1](https://blog.csdn.net/hanging_gardens/article/details/72724258)
+[blog.csdn2](https://blog.csdn.net/duanyajun987/article/details/81505006)
+
+# 4. File directories.
 ```shell
 MultiNet
 ├── data
