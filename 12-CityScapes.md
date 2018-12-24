@@ -1,5 +1,12 @@
 # CityScapes dataset.
 [github](https://github.com/mcordts/cityscapesScripts#scripts)
+---
+# My login count.
+* email: xiaomeixuehao@bit.edu.cn
+* key: me+1230 
+---
+# blog
+[csdn](https://blog.csdn.net/zz2230633069/article/details/84591532)
 
 ---
 # 1. data structure.
@@ -46,5 +53,14 @@ L62 Label 'road' color:`[255,0,255]`, else, `[255,0,0]`.
 $ python demo_seg\&obj.py --input data/demo/6_8.png
 # run train.py
 $ python train.py --hypes hypes/multinet2.json
+```
+
+# 5 run evaluate script.
+* prediction images are put in `CITYSCAPES_DATASET/results/`
+* gt & prediction pair: `<city>_123456_123456*.png` & `<city>_123456_123456_gtFine_labelIds.png`
+* only one image associate with gt image, otherwise it will print " ERROR: Found multiple predictions for ground truth".
+* run script.
+```shell
+$ python cityscapesScripts/cityscapesscripts/evaluation/evalPixelLevelSemanticLabeling.py
 ```
 

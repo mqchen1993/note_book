@@ -120,3 +120,11 @@ EndSection
 ```
 ## 重启机器
 
+# 设置xorg.conf 默认虚拟屏幕
+```shell
+$ cd /etc/X11
+$ sudo vim xorg.conf
+# add the line to Section "Device"
+$ Option      "AllowEmptyInitialConfiguration" "true"
+```
+
