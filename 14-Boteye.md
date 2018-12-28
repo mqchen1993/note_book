@@ -33,7 +33,7 @@ cmake ..
 make -j2
 ```
 
-# run app 
+# 4. run app 
 ```shell
 $ source config_environment.sh
 $ ./app_tracking/app_tracking -sensor_type XP3 -calib_file ../../calib_params/XP3.yaml -show_depth
