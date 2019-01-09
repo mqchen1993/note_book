@@ -7,6 +7,7 @@
 > export ROS_HOSTNAME=localhost
 > export ROS_MASTER_URI=http://tegra-ubuntu.local:11311
 
+--------------------------------------------------
 # ssh to robot
 * ssh tinker@10.42.0.129
 * ssh tinker@10.42.0.43
@@ -34,6 +35,7 @@ SUBSYSTEM=="tty", ENV{ID_SERIAL_SHORT}=="0001",MODE="0666", OWNER="tinker", GROU
 # nvidia
 * ssh nvidia@10.42.0.43
 
+--------------------------------------------------
 # udev rules
 * lsusb
 > ID `0403:6001` => (idVendor:idProduct)
@@ -47,7 +49,7 @@ SUBSYSTEM=="tty", ENV{ID_SERIAL_SHORT}=="0001",MODE="0666", OWNER="tinker", GROU
 #
 KERNEL=="ttyUSB*", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", MODE:="0666", SYMLINK+="autolabor_pro1"
 ```
-
+--------------------------------------------------
 # tx2
 sudo apt-get install ros-kinetic-dwa-local-planner
 sudo apt-get install ros-kinetic-global-planner
@@ -59,14 +61,16 @@ ssh nvidia@10.42.0.74
 ## 33_tx2_vncviewer
 wlan: 192.168.1.102
 eth0: 10.42.0.1
-
+--------------------------------------------------
 # install x11vnc
 https://blog.csdn.net/longhr/article/details/51657610
 https://blog.csdn.net/styshoo/article/details/52706138
 
+--------------------------------------------------
 # ssh IPV6 
 ssh -6 jun@fe80::3640:fb18:95b0:a93%enp3s0
 
+--------------------------------------------------
 # linux cutecom
 ## install cutecom
 ```shell
@@ -88,6 +92,7 @@ $ make
 $ sudo make install
 ```
 
+--------------------------------------------------
 # nvidia GPU FAN PWM
 ## 1.设置多显卡降温
 ```shell
@@ -120,6 +125,7 @@ EndSection
 ```
 ## 重启机器
 
+--------------------------------------------------
 # 设置xorg.conf 默认虚拟屏幕
 ```shell
 $ cd /etc/X11
@@ -127,4 +133,11 @@ $ sudo vim xorg.conf
 # add the line to Section "Device"
 $ Option      "AllowEmptyInitialConfiguration" "true"
 ```
+
+--------------------------------------------------
+# Teamviewer
+* 1078057326
+
+# jun-pc
+ip: 192.168.1.121
 
