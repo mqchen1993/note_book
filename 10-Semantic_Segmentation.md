@@ -1,7 +1,11 @@
 # 1 
   知乎专栏
+
 # 2
 [专知](https://mp.weixin.qq.com/s?__biz=MzU2OTA0NzE2NA==&mid=2247485464&idx=3&sn=77fd30180cf66e1cb7b276509b38f358&chksm=fc85e90bcbf2601dfe6439076bb00896befe621dcdd75dfb77a931839b3b362d3226c4cd2ad5&mpshare=1&scene=24&srcid=10099bEid5dfACiAXiznsOX8#rd)
+
+# 3
+* [Semantic Segmentation using Fully Convolutional Networks over the years](https://meetshah1995.github.io/semantic-segmentation/deep-learning/pytorch/visdom/2017/06/01/semantic-segmentation-over-the-years.html)
 
 # CSDN翻译专栏
 [CSDN翻译专栏](https://blog.csdn.net/quincuntial/article/details/77263607)

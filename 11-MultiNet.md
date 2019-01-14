@@ -13,6 +13,9 @@ $ cd submodules/KittiBox/submodules/KittiObjective2/ && make
 $ python demo_seg\&obj.py --input data/demo/6_8.png
 # run train.py
 $ python train.py --hypes hypes/multinet2.json
+# run predict_joint.py
+$ python predict_joint.py --logdir RUNS/MultiNet_ICCV/
+
 ```
 ---
 
