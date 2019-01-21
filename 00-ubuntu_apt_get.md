@@ -63,4 +63,6 @@
 #	sudo apt-get install simplescreenrecorder
 
 # 	开机开启数字小键盘(https://www.linuxidc.com/Linux/2016-09/135365.htm)
-	
+
+# firefox 翻译插件
+* ImTranslator

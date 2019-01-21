@@ -13,9 +13,10 @@ $ cd submodules/KittiBox/submodules/KittiObjective2/ && make
 $ python demo_seg\&obj.py --input data/demo/6_8.png
 # run train.py
 $ python train.py --hypes hypes/multinet2.json
+# train resnet
+$ python train.py --hypes hypes/KittiSeg_ResNet.json 
 # run predict_joint.py
 $ python predict_joint.py --logdir RUNS/MultiNet_ICCV/
-
 ```
 ---
 
@@ -23,6 +24,11 @@ $ python predict_joint.py --logdir RUNS/MultiNet_ICCV/
 [blog.csdn1](https://blog.csdn.net/hanging_gardens/article/details/72724258)
 [blog.csdn2](https://blog.csdn.net/duanyajun987/article/details/81505006)
 [blog.csdn3](https://blog.csdn.net/QiangLi_strong/article/details/81022966)
+
+# 4. Train on ResNet
+* Download ResNet.ckpt
+[ResNet-L101.ckpt](ftp://mi.eng.cam.ac.uk/pub/mttt2/models/tensorflow_resnet/)
+* mkdir 'DATA/weights/tensorflow_resnet/ResNet-L101.ckpt'
 
 # 4. File directories.
 ```shell
