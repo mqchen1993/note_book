@@ -40,13 +40,13 @@ Speed (fps) (raw)    :  23.3336
 * [AP wiki](https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#Mean_average_precision)
 * [blog1](https://blog.csdn.net/niaolianjiulin/article/details/53098437)
 * [blog2](https://blog.csdn.net/hysteric314/article/details/54093734)
-* 以recall为横坐标（0~1），precision为纵坐标（0~1）作图。得到一条曲线。该曲线下的面积即为AP.
-$$ AP = \int_0^1 {p(r)} dr \, $$ 
+* 以recall为横坐标（0~1),precision为纵坐标（0~1）作图。得到一条曲线。该曲线下的面积即为AP.
+$$ AP = \int_0^1 {p(r)} dr $$ 
 
 # 2019.01.14
 - [x] **标注Cityscape数据集**
 * [blog1](https://blog.csdn.net/fabulousli/article/details/78633531)
-* [labelme 工具](https://github.com/wkentaro/labelme) 				yes
+* [labelme 工具](https://github.com/wkentaro/labelme) 
 
 # 2019.01.15
 - [x] **发现好博客**
@@ -99,8 +99,8 @@ $$ AP = \int_0^1 {p(r)} dr \, $$
 - [x] **看第四章“目标定位优化”** 
 
 - [x] **专知[目标检测专栏]**
-* https://mp.weixin.qq.com/s?__biz=MzU2OTA0NzE2NA==&mid=2247485072&idx=2&sn=e9f4f0d1daeb3a144e37fcfcc61e908f&chksm=fc85e783cbf26e95d153af7c825ef9b8fc4fc6fd37f75709de98eae769e6b70f8da29ae65a73&scene=21#wechat_redirect
-* http://deeplearning.csail.mit.edu/
+* [link](https://mp.weixin.qq.com/s?__biz=MzU2OTA0NzE2NA==&mid=2247485072&idx=2&sn=e9f4f0d1daeb3a144e37fcfcc61e908f&chksm=fc85e783cbf26e95d153af7c825ef9b8fc4fc6fd37f75709de98eae769e6b70f8da29ae65a73&scene=21#wechat_redirect)
+* [CVPR'17 Tutorial](http://deeplearning.csail.mit.edu/)
 * [图像目标检测（Object Detection）原理与实现 （1-6）](https://blog.csdn.net/marvin521/article/details/9058735)
 * 下载了[基于特征共享的高效物体检测_任少卿.pdf]
 * 下载了[Bounding-box_regression详解.pdf]
@@ -132,7 +132,9 @@ $$ AP = \int_0^1 {p(r)} dr \, $$
 crop-pool4 = score-pool4[:, :, 5:5+score2.height, 5:5+score2.width]
 ```
 * `Deconvelution`计算：`score-fr`[1,21,16,16] -> `score2` [1,21,34,34] , kernel_size:4, stride:2
-$$ 16 = (34-4)/2+1 $$
+> Conv: $$ out = (in+2*pad-kernel)/stride + 1 $$
+> DeConv: $$ out = (in-1)*stride + kernel -2*pad $$
+> And Now: $$ 34 = (16-1)*2+4-2*0 $$
 
 # 2019.01.25 
 - [x] **[FCN学习:Semantic Segmentation]**
@@ -141,12 +143,33 @@ $$ 16 = (34-4)/2+1 $$
 * [Caffe 中如何计算卷积](https://www.zhihu.com/question/28385679)
 1. Input feature to Matrix
 ![Input feature to Matrix](https://pic1.zhimg.com/80/v2-701705db7504bb24f859122545b23174_hd.png)
-2. 
+2. Filters to matrix
+![Filters to matrix](https://pic1.zhimg.com/80/v2-339657291663a4e791a9b34952d5859c_hd.png)
+3. `Filter Matrix`乘以`Feature Matrix`的转置,得到输出矩阵`Cout x (H x W)`,就可以解释为输出的三维Blob`(Cout x H x W)`
+4. Detail sample.
 ![Caffe conv](https://pic4.zhimg.com/80/a6421bae22236c0509623b8b7f7bbb03_hd.jpg)
+5. 多通道卷积计算方式
+![多通道卷积](https://pic1.zhimg.com/80/v2-8d72777321cbf1336b79d839b6c7f9fc_hd.jpg)
+* 矩阵微分公式:
+$$ \frac {d(Ax+b)}{dx} = {A^T}$$
+
+# 2019.01.26
+- [x] **[一文读懂Faster RCNN]**
+* [link](https://zhuanlan.zhihu.com/p/31426458)
+* ![Faster R-CNN](https://pic4.zhimg.com/80/v2-e64a99b38f411c337f538eb5f093bdf3_hd.jpg)
+* bounding box regression原理
+* 对于一副任意大小PxQ图像,传入Faster RCNN前首先reshape到固定MxN,im_info=[M, N, scale_factor]则保存了此次缩放的所有信息,然后经过Conv Layers,经过4次pooling变为WxH=(M/16)x(N/16)大小,其中feature_stride=16则保存了该信息,用于计算anchor偏移量.
+
+
 
 
 # ==TODO==
-- [ ] [一文读懂Faster RCNN](https://zhuanlan.zhihu.com/p/31426458)
+- [ ] GDB调试工具
+
+- [ ] 服务器安装Anaconda环境,Caffe,跑FCN
+
+- [ ] 跑通Faster R-CNN
+
 - [ ] [Object Detection and Classification using R-CNNs](http://www.telesens.co/2018/03/11/object-detection-and-classification-using-r-cnns/)
 
 - [ ] [完全解析RNN, Seq2Seq, Attention注意力机制](https://zhuanlan.zhihu.com/p/51383402)
