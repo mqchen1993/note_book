@@ -54,6 +54,11 @@ $ conda create --name py3 python=3.6
 $ conda remove -n py27 --all
 ```
 
+# 2.4 查看当前设置了哪些虚拟环境
+```shell
+$ conda env list
+```
+
 ## 切换系统python2.7和anconda3环境
 ```shell
 # added by Anaconda3 4.2.0 installer
@@ -69,9 +74,25 @@ $ rm -rf ~/anaconda3/
 $ source ~/.bashrc
 ```
 
+## 
+```shell
+# 查看安装了哪些包
+$ conda list
+# 安装包
+$ conda install package_name
+# 查看当前存在哪些虚拟环境 
+$ conda env list
+$ conda info -e
+# 检查更新当前conda
+$ conda update conda
+# 虚拟环境中安装额外的包
+$ conda install -n py27 package_name
+# 删除环境中的某个包
+$ conda remove --name py27 package_name
+```
 
 ---------------
-
+# Build caffe
 ## Modify `Makefile.config`.
 ```shell
 # Anaconda Python distribution is quite popular. Include path:
