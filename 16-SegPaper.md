@@ -4,6 +4,8 @@
 # 4. 将pooling层换成边缘检测层试一下效果。
 # 5. 注意力模型
 # 6. 现在训练网络都是让网络“猜dog在哪里？在这里”(前向传播), "不对，你离正确答案多远"（计算loss）；“我再猜一下”（反向传播）；能不能设计一种训练结构，告诉网络“这张图中dog在哪里”。
+# 7. 在分割网络中加入ROI-Pooling层
+* Input -> ROI Pooling -> FCN
 ## 使用ResNet实现的分割网络效果state-of-art. 
 
 ------------------
@@ -148,7 +150,7 @@ crop-pool4 = score-pool4[:, :, 5:5+score2.height, 5:5+score2.width]
 3. `Filter Matrix`乘以`Feature Matrix`的转置,得到输出矩阵`Cout x (H x W)`,就可以解释为输出的三维Blob`(Cout x H x W)`
 4. Detail sample.
 ![Caffe conv](https://pic4.zhimg.com/80/a6421bae22236c0509623b8b7f7bbb03_hd.jpg)
-5. 多通道卷积计算方式
+5. 多.通道卷积计算方式
 ![多通道卷积](https://pic1.zhimg.com/80/v2-8d72777321cbf1336b79d839b6c7f9fc_hd.jpg)
 * 矩阵微分公式:
 $$ \frac {d(Ax+b)}{dx} = {A^T}$$
@@ -160,14 +162,35 @@ $$ \frac {d(Ax+b)}{dx} = {A^T}$$
 * bounding box regression原理
 * 对于一副任意大小PxQ图像,传入Faster RCNN前首先reshape到固定MxN,im_info=[M, N, scale_factor]则保存了此次缩放的所有信息,然后经过Conv Layers,经过4次pooling变为WxH=(M/16)x(N/16)大小,其中feature_stride=16则保存了该信息,用于计算anchor偏移量.
 
+# 2019.01.27
+- [x] **GDB调试工具**
+* [RMS's gdb Debugger Tutorial](http://www.unknownroad.com/rtfm/gdbtut/)
+```shell
+$ gcc -g inf.c			# Compile the program with debugging flags.
+$ gdb a.out				# Lets load up gdb.
+$ run & ctrl+c			# Set off the infinite loop, then press `Ctrl-C` to send the program a SIGINT. 
+$ backtrace				# We will use the `backtrace` command to examine the stack
+$ frame 1
+```
 
+- [ ] **gdb 调试入门**
+* [gdb 调试入门](http://blog.jobbole.com/107759/)
 
+## Qt学习
+- [ ] **Qt入门学习——Qt Creator的使用**
+* [Qt入门学习——Qt Creator的使用](https://blog.csdn.net/tennysonsky/article/details/48004119)
+
+-[ ] **Qt 学习之路 2**
+* [Qt 学习之路 2](https://www.devbean.net/category/qt-study-road-2/)
+
+# 2019.01.28
+- [ ] 服务器安装Anaconda环境
+* [blog](https://blog.csdn.net/qq_17534301/article/details/80869998)
+* [Installing on Linux](http://docs.anaconda.com/anaconda/install/linux/)
+* [Anaconda installer archive](https://repo.anaconda.com/archive/)
 
 # ==TODO==
-- [ ] GDB调试工具
-
-- [ ] 服务器安装Anaconda环境,Caffe,跑FCN
-
+- [ ] 安装Caffe,跑FCN
 - [ ] 跑通Faster R-CNN
 
 - [ ] [Object Detection and Classification using R-CNNs](http://www.telesens.co/2018/03/11/object-detection-and-classification-using-r-cnns/)

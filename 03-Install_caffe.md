@@ -49,15 +49,19 @@ sudo gedit Makefile.config
             -gencode arch=compute_61,code=sm_61 \  
             -gencode arch=compute_61,code=compute_61 
 ```
+
 * Modify Makefile
 ```shell
-> NVCCFLAGS += -D_FORCE_INLINES -ccbin=$(CXX) -Xcompiler -fPIC $(COMMON_FLAGS)
-> LIBRARIES += glog gflags protobuf boost_system boost_filesystem m hdf5_serial_hl hdf5_serial
+> L425: NVCCFLAGS += -D_FORCE_INLINES -ccbin=$(CXX) -Xcompiler -fPIC $(COMMON_FLAGS)
+> l181: LIBRARIES += glog gflags protobuf boost_system boost_filesystem m hdf5_serial_hl hdf5_serial
+```
+
 * Python requirements
 ```shell
 cd caffe/python
 for req in $(cat requirements.txt); do pip install $req; done
 ```
+
 * Compilation
 ```shell
 make all
