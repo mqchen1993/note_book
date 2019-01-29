@@ -36,12 +36,12 @@ sudo apt-get install libatlas-base-dev
 ```shell
 sudo cp Makefile.config.example Makefile.config
 sudo gedit Makefile.config
-> USE_CUDNN := 1
-> OPENCV_VERSION := 3
-> WITH_PYTHON_LAYER := 1
-> INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/include/hdf5/serial
-> LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib /usr/lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu/hdf5/serial
-> CUDA_ARCH := -gencode arch=compute_30,code=sm_30 \
+> L5: USE_CUDNN := 1
+> L23: OPENCV_VERSION := 3
+> L93: WITH_PYTHON_LAYER := 1
+> L96: INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/include/hdf5/serial
+> L97: LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib /usr/lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu/hdf5/serial
+> L39: CUDA_ARCH := -gencode arch=compute_30,code=sm_30 \
             -gencode arch=compute_35,code=sm_35 \  
             -gencode arch=compute_50,code=sm_50 \  
             -gencode arch=compute_52,code=sm_52 \  
