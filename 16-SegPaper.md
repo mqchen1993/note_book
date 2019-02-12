@@ -180,17 +180,39 @@ $ frame 1
 - [ ] **Qt入门学习——Qt Creator的使用**
 * [Qt入门学习——Qt Creator的使用](https://blog.csdn.net/tennysonsky/article/details/48004119)
 
--[ ] **Qt 学习之路 2**
+- [ ] **Qt 学习之路 2**
 * [Qt 学习之路 2](https://www.devbean.net/category/qt-study-road-2/)
 
 # 2019.01.28
-- [ ] 服务器安装Anaconda环境
+- [x] **服务器安装Anaconda环境**
 * [blog](https://blog.csdn.net/qq_17534301/article/details/80869998)
 * [Installing on Linux](http://docs.anaconda.com/anaconda/install/linux/)
 * [Anaconda installer archive](https://repo.anaconda.com/archive/)
 
+# 2019.01.29
+- [x] **安装Caffe**
+* see update of `03-Install_caffe.md`
+
+- [x] **跑FCN**
+* git clone https://github.com/shelhamer/fcn.berkeleyvision.org.git
+* Download voc-fcn8s caffe model.
+```shell
+$ cd fcn.berkeleyvision.org/voc-fcn8s/
+$ proxychains wget http://dl.caffe.berkeleyvision.org/fcn8s-heavy-pascal.caffemodel
+```
+* run
+```shell
+$ conda activate py27
+$ python infer.py
+```
+* vis of caffe net.
+[NetScope](http://ethereon.github.io/netscope/#/editor)
+
+## sublime 高亮当前行
+* [blog](https://yijile.com/log/128.html)
+
 # ==TODO==
-- [ ] 安装Caffe,跑FCN
+
 - [ ] 跑通Faster R-CNN
 
 - [ ] [Object Detection and Classification using R-CNNs](http://www.telesens.co/2018/03/11/object-detection-and-classification-using-r-cnns/)

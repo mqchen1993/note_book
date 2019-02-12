@@ -74,7 +74,7 @@ $ rm -rf ~/anaconda3/
 $ source ~/.bashrc
 ```
 
-## 
+## 常用命令
 ```shell
 # 查看安装了哪些包
 $ conda list
