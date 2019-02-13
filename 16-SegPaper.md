@@ -211,9 +211,84 @@ $ python infer.py
 ## sublime 高亮当前行
 * [blog](https://yijile.com/log/128.html)
 
+# 2019.02.13
+- [x] **跑通Faster R-CNN**
+* [github](https://github.com/smallcorgi/Faster-RCNN_TF)
+
+## Install dependeces.
+```shell
+# change to python 2.7
+$ sudo pip install easydict
+```
+## Build.
+```shell
+$ cd Faster-RCNN_TF/lib
+$ make
+```
+
+## Run demo.py
+```shell
+$ python ./tools/demo.py --model ./data/model/VGGnet_fast_rcnn_iter_70000.ckpt
+```
+### Run Errors.
+* ERROR 1
+> tensorflow.python.framework.errors_impl.NotFoundError: /home/jun/Documents/Faster-RCNN_TF/tools/../lib/roi_pooling_layer/roi_pooling.so: undefined symbol: _ZTIN10tensorflow8OpKernelE
+
+```shell
+TF_INC=$(python -c 'import tensorflow as tf; print(tf.sysconfig.get_include())')
+# Define `TF_LIB=$(python -c 'import tensorflow as tf; print(tf.sysconfig.get_lib())')` and modify the `g++` call to include `-L$TF_LIB -ltensorflow_framework`
+TF_LIB=$(python -c 'import tensorflow as tf; print(tf.sysconfig.get_lib())')
+
+CUDA_PATH=/usr/local/cuda/
+CXXFLAGS=''
+
+if [[ "$OSTYPE" =~ ^darwin ]]; then
+	CXXFLAGS+='-undefined dynamic_lookup'
+fi
+
+cd roi_pooling_layer
+
+if [ -d "$CUDA_PATH" ]; then
+	nvcc -std=c++11 -c -o roi_pooling_op.cu.o roi_pooling_op_gpu.cu.cc \
+		-I $TF_INC -D GOOGLE_CUDA=1 -x cu -Xcompiler -fPIC $CXXFLAGS \
+# sm_61 for 1080Ti
+		-arch=sm_61
+# add `-L$TF_LIB -ltensorflow_framework` & `-D_GLIBCXX_USE_CXX11_ABI=`
+	g++ -std=c++11 -shared -o roi_pooling.so roi_pooling_op.cc \
+		roi_pooling_op.cu.o -I $TF_INC  -D GOOGLE_CUDA=1 -fPIC $CXXFLAGS -D_GLIBCXX_USE_CXX11_ABI=0 \
+		-lcudart -L $CUDA_PATH/lib64 -L $TF_LIB -ltensorflow_framework
+else
+	g++ -std=c++11 -shared -o roi_pooling.so roi_pooling_op.cc \
+		-I $TF_INC -fPIC $CXXFLAGS
+fi
+
+cd ..
+```
+* ERROR 2
+> feed_in, dim = (input, int(input_shape[-1])) TypeError: __int__ returned non-int (type NoneType)
+```shell
+# https://github.com/smallcorgi/Faster-RCNN_TF/issues/316
+# add the following lines to lib/roi_pooling_layer/roi_pooling_op.cc, and make
+L27 #include "tensorflow/core/framework/shape_inference.h"
+L41-L53
+.SetShapeFn([](::tensorflow::shape_inference::InferenceContext* c) {
+      //https://github.com/tensorflow/.../core/framework/shape_inference.h
+      int pooled_height;
+      int pooled_width;
+      c->GetAttr("pooled_height", &pooled_height);
+      c->GetAttr("pooled_width", &pooled_width);
+      auto pooled_height_h = c->MakeDim(pooled_height);
+      auto pooled_width_h = c->MakeDim(pooled_width);
+
+      auto output_shape = c->MakeShape({ c->Dim(c->input(1), 0), pooled_height_h, pooled_width_h, c->Dim(c->input(0), 3) });
+      c->set_output(0, output_shape);
+      return Status::OK();
+    });
+```
+
 # ==TODO==
 
-- [ ] 跑通Faster R-CNN
+
 
 - [ ] [Object Detection and Classification using R-CNNs](http://www.telesens.co/2018/03/11/object-detection-and-classification-using-r-cnns/)
 
