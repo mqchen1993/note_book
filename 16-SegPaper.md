@@ -6,6 +6,8 @@
 # 6. 现在训练网络都是让网络“猜dog在哪里？在这里”(前向传播), "不对，你离正确答案多远"（计算loss）；“我再猜一下”（反向传播）；能不能设计一种训练结构，告诉网络“这张图中dog在哪里”。
 # 7. 在分割网络中加入ROI-Pooling层
 * Input -> ROI Pooling -> FCN
+# 8. 在分割网络中加入边缘检测层，结合边缘对score层进行采样分类，当一个轮廓中大于阈值的像素点属于A类，则划为A类。
+
 ## 使用ResNet实现的分割网络效果state-of-art. 
 
 ------------------
@@ -202,14 +204,18 @@ $ proxychains wget http://dl.caffe.berkeleyvision.org/fcn8s-heavy-pascal.caffemo
 ```
 * run
 ```shell
-$ conda activate py27
+$ conda activate py27	# for `added by Anaconda3 5.3.0 installer` in '~/.bashrc'
+or
+$ source activate py27	# for `export PATH="/home/jun/anaconda3/bin:$PATH"` in '~/.bashrc'
 $ python infer.py
 ```
+
 * vis of caffe net.
 [NetScope](http://ethereon.github.io/netscope/#/editor)
 
 ## sublime 高亮当前行
 * [blog](https://yijile.com/log/128.html)
+
 
 # 2019.02.13
 - [x] **跑通Faster R-CNN**
@@ -286,11 +292,18 @@ L41-L53
     });
 ```
 
+# 2019.02.13
+- [x] **Object Detection and Classification using R-CNNs**
+* [link](http://www.telesens.co/2018/03/11/object-detection-and-classification-using-r-cnns/)
+* Network Architecture
+![network](http://www.telesens.co/wp-content/uploads/2018/03/img_5a9ffec911c19.png)
+
+# 2019.02.16
+* seg featuremap 在voc数据集上输出有为[1, 21, 500, 500],经过np.argmax(axis=0)得到[500, 500]的segmentation image of class IDs，相当于在channel方向上对每个像素进行分类，取channel方向上概率最大值作为该像素类别。
+
 # ==TODO==
 
 
-
-- [ ] [Object Detection and Classification using R-CNNs](http://www.telesens.co/2018/03/11/object-detection-and-classification-using-r-cnns/)
 
 - [ ] [完全解析RNN, Seq2Seq, Attention注意力机制](https://zhuanlan.zhihu.com/p/51383402)
 

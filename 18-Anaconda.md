@@ -39,9 +39,11 @@ $ conda create --name py27 python=2.7
 # Proceed ([y]/n)? y
 ---
 # To activate this environment, use
-$ conda activate py27
+$ conda activate py27	# for `added by Anaconda3 5.3.0 installer` in '~/.bashrc'
+$ source activate py27	# for `export PATH="/home/jun/anaconda3/bin:$PATH"` in '~/.bashrc'
 # To deactivate an active environment, use
 $ conda deactivate
+$ source deactivate
 ```
 
 ### 2.2 基于 python3.6 创建一个名为py3 的环境：

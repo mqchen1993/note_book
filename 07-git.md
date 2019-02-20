@@ -17,6 +17,7 @@ $ git push -u origin master
 
 # git on jun-git
 ```shell
+$ cd /home/git/
 $ sudo git init --bare sample.git
 $ sudo chown -R git:git sample.git
 $ git clone git@jun-git:/home/git/sample.git
