@@ -369,21 +369,24 @@ https://github.com/jasjeetIM/Mask-RCNN [Caffe]
 
 - [ ] **maskrcnn_slides.pdf**
 * [region-of-interest-pooling-explained](https://deepsense.ai/region-of-interest-pooling-explained/)
-![ROI-Pooling](https://cdn-sv1.deepsense.ai/wp-content/uploads/2017/02/roi_pooling-1.gif)
 * Backbone (`ResNeXt`): +1:6APbb
 
 ## `RoIPooling` & `RoIAlign`
 ### `RoIPooling`
 1. Let’s consider a small example to see how it works. We’re going to perform region of interest pooling on a single 8×8 feature map, one region of interest and an output size of 2×2. Our input feature map looks like this:
 ![Feature Map](https://cdn-sv1.deepsense.ai/wp-content/uploads/2017/02/1.jpg)
+
 2. Let’s say we also have a region proposal (top left, bottom right coordinates): (0, 3), (7, 8). In the picture it would look like this:
 ![region proposal](https://cdn-sv1.deepsense.ai/wp-content/uploads/2017/02/2.jpg)
+
 3. Normally, there’d be multiple feature maps and multiple proposals for each of them, but we’re keeping things simple for the example.
 By dividing it into (2×2) sections (because the output size is 2×2) we get:
 ![2×2 sections](https://cdn-sv1.deepsense.ai/wp-content/uploads/2017/02/3.jpg)
-5. The max values in each of the sections are:
+
+4. The max values in each of the sections are:
 ![output](https://cdn-sv1.deepsense.ai/wp-content/uploads/2017/02/output.jpg)
-6. Here’s our example presented in form of a nice animation:
+
+5. Here’s our example presented in form of a nice animation:
 ![gif](https://cdn-sv1.deepsense.ai/wp-content/uploads/2017/02/roi_pooling-1.gif)
 
 
