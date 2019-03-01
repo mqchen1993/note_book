@@ -30,7 +30,14 @@ $ python predict_joint.py --logdir RUNS/MultiNet_ICCV/
 [ResNet-L101.ckpt](ftp://mi.eng.cam.ac.uk/pub/mttt2/models/tensorflow_resnet/)
 * mkdir 'DATA/weights/tensorflow_resnet/ResNet-L101.ckpt'
 
-# 4. File directories.
+# 5. Code Reading
+* 2019.02.21
+train.py 
+with tf.name_scope("Loss"):
+        losses = objective.loss(hypes, decoded_logits,
+                                labels)aper: 4. Training Details -> Loss function:
+
+# File directories.
 ```shell
 MultiNet
 ├── data

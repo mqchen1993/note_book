@@ -8,6 +8,14 @@
 * Input -> ROI Pooling -> FCN
 # 8. 在分割网络中加入边缘检测层，结合边缘对score层进行采样分类，当一个轮廓中大于阈值的像素点属于A类，则划为A类。
 
+# 9. 在激活函数Relu等上做文章，让网络逐渐收敛到真值（比如正负二分类），不用softmax和argmax等。
+
+# 10. 在feature map中手工加入边缘检测层， 让网络自己学习把边缘信息加入分割判断中。
+
+# 11. 将卷积操作的 'bias'值换成相应区域的边缘图像试试。
+
+# 12. [COS_Net.jpg]
+
 ## 使用ResNet实现的分割网络效果state-of-art. 
 
 ------------------
@@ -67,7 +75,7 @@ $$ AP = \int_0^1 {p(r)} dr $$
 # 2019.01.16
 - [x] **[Semantic Segmentation using Fully Convolutional Networks over the years]**
 * [link](https://meetshah1995.github.io/semantic-segmentation/deep-learning/pytorch/visdom/2017/06/01/semantic-segmentation-over-the-years.html)
-* [visualization of FCN](http://ethereon.github.io/netscope/#/preset/fcn-8s-pascal)
+* [vis of FCN](http://ethereon.github.io/netscope/#/preset/fcn-8s-pascal)
 * [vis of common networks](http://ethereon.github.io/netscope/quickstart.html)
 * [Deconvolutions](https://distill.pub/2016/deconv-checkerboard/)
 * LinkNet: A feature map with shape [H, W, n_channels] is first convolved with a 1*1 kernel to get a feature map with shape [H, W, n_channels / 4 ] and then a deconvolution takes it to [2*H, 2*W, n_channels / 4 ] a final 1*1 kernel convolution to take it to [2*H, 2*W, n_channels / 2 ]. Thus the decoder block fewer parameters due to this channel reduction scheme.
@@ -160,9 +168,31 @@ $$ \frac {d(Ax+b)}{dx} = {A^T}$$
 # 2019.01.26
 - [x] **[一文读懂Faster RCNN]**
 * [link](https://zhuanlan.zhihu.com/p/31426458)
-* ![Faster R-CNN](https://pic4.zhimg.com/80/v2-e64a99b38f411c337f538eb5f093bdf3_hd.jpg)
+* Faster R-CNN网络结构图:
+![Faster R-CNN](https://pic4.zhimg.com/80/v2-e64a99b38f411c337f538eb5f093bdf3_hd.jpg)
 * bounding box regression原理
 * 对于一副任意大小PxQ图像,传入Faster RCNN前首先reshape到固定MxN,im_info=[M, N, scale_factor]则保存了此次缩放的所有信息,然后经过Conv Layers,经过4次pooling变为WxH=(M/16)x(N/16)大小,其中feature_stride=16则保存了该信息,用于计算anchor偏移量.
+------
+## update 2019.02.27
+* VGG Feature Map: "conv5_3".
+* 9个anchors(矩形)共有3种形状，长宽比为大约为{width:height} = {1:1, 1:2, 2:1} 三种(ps. 每种比例有三个尺度)，如图所示:
+![anchors](https://pic4.zhimg.com/80/v2-7abead97efcc46a3ee5b030a2151643f_hd.jpg)
+* 在caffe基本数据结构blob中以如下形式保存数据：
+```python
+blob = [batch, channel, height, width] = [N, C, H, W]
+```
+* bounding box regression原理
+> 窗口一般使用四维向量 (x, y, w, h) 表示，分别表示窗口的`中心点`坐标、`宽`和`高`.
+> 先做平移，再做缩放。
+* 对于训练bouding box regression网络回归分支，输入是cnn feature Φ，监督信号是Anchor与GT的差距 (t_x, t_y, t_w, t_h)，即训练目标是：输入 Φ的情况下使网络输出与监督信号尽可能接近。
+那么当bouding box regression工作时，再输入Φ时，回归网络分支的输出就是每个Anchor的平移量和变换尺度 (t_x, t_y, t_w, t_h)，显然即可用来修正Anchor位置了。
+* 解释im_info。对于一副任意大小PxQ图像，传入Faster RCNN前首先reshape到固定MxN，`im_info`=[M, N, scale_factor]则保存了此次缩放的所有信息。
+* 经过Conv Layers，经过4次pooling变为WxH=(M/16)x(N/16)大小，其中`feature_stride=16`则保存了该信息，用于计算anchor偏移量。
+* RPN网络处理流程：
+> 生成anchors -> softmax分类器提取fg anchors -> bbox reg回归fg anchors -> Proposal Layer生成proposal boxes=[x1, y1, x2, y2]
+* See [COS_Net.jpg].
+* 从PoI Pooling获取到`7x7=49`大小的proposal feature maps.
+* 在训练和检测阶段生成和存储anchors的顺序完全一样，这样训练结果才能被用于检测！
 
 # 2019.01.27
 - [x] **GDB调试工具**
@@ -301,9 +331,80 @@ L41-L53
 # 2019.02.16
 * seg featuremap 在voc数据集上输出有为[1, 21, 500, 500],经过np.argmax(axis=0)得到[500, 500]的segmentation image of class IDs，相当于在channel方向上对每个像素进行分类，取channel方向上概率最大值作为该像素类别。
 
+# 2019.02.21 - 2019.02.27
+- [x] **MultiNet源码**
+* See `11-MultiNet.md`
+
+# 2019.02.27
+- [x] **复习 [一文读懂Faster RCNN]**
+* See `update 2019.02.27`.
+* [Faster-rcnn详解](https://blog.csdn.net/WZZ18191171661/article/details/79439212)
+
 # ==TODO==
 
+# 2019.02.28
+## CSDN翻译专栏
+[CSDN翻译专栏](https://blog.csdn.net/quincuntial/article/details/77263607)
+
+# 2019.02.29 - 2019.03.03
+- [ ] **Mask-RCNN**
+* 专知语义分割专栏
+```python
+Mask-RCNN [https://arxiv.org/pdf/1703.06870.pdf]
+
+https://github.com/CharlesShang/FastMaskRCNN [Tensorflow]
+
+https://github.com/TuSimple/mx-maskrcnn [MxNet]
+
+https://github.com/matterport/Mask_RCNN [Keras]
+
+https://github.com/jasjeetIM/Mask-RCNN [Caffe]
+```
+
+# 2019.03.01
+## Mask R-CNN
+- [x] [Mask R-CNN详解](https://blog.csdn.net/WZZ18191171661/article/details/79453780)
+
+- [x] **Mask_R-CNN.mp4**
+
+- [ ] **maskrcnn_slides.pdf**
+* [region-of-interest-pooling-explained](https://deepsense.ai/region-of-interest-pooling-explained/)
+![ROI-Pooling](https://cdn-sv1.deepsense.ai/wp-content/uploads/2017/02/roi_pooling-1.gif)
+* Backbone (`ResNeXt`): +1:6APbb
+
+## `RoIPooling` & `RoIAlign`
+### `RoIPooling`
+1. Let’s consider a small example to see how it works. We’re going to perform region of interest pooling on a single 8×8 feature map, one region of interest and an output size of 2×2. Our input feature map looks like this:
+![Feature Map](https://cdn-sv1.deepsense.ai/wp-content/uploads/2017/02/1.jpg)
+2. Let’s say we also have a region proposal (top left, bottom right coordinates): (0, 3), (7, 8). In the picture it would look like this:
+![region proposal](https://cdn-sv1.deepsense.ai/wp-content/uploads/2017/02/2.jpg)
+3. Normally, there’d be multiple feature maps and multiple proposals for each of them, but we’re keeping things simple for the example.
+By dividing it into (2×2) sections (because the output size is 2×2) we get:
+![2×2 sections](https://cdn-sv1.deepsense.ai/wp-content/uploads/2017/02/3.jpg)
+5. The max values in each of the sections are:
+![output](https://cdn-sv1.deepsense.ai/wp-content/uploads/2017/02/output.jpg)
+6. Here’s our example presented in form of a nice animation:
+![gif](https://cdn-sv1.deepsense.ai/wp-content/uploads/2017/02/roi_pooling-1.gif)
 
 
+### `RoIAlign`
+> 
+
+* [Mask R-CNN 论文翻译](https://alvinzhu.xyz/2017/10/07/mask-r-cnn/#fn:18)
+* [Mask R-CNN完整翻译](https://blog.csdn.net/myGFZ/article/details/79136610)
+* [Mask RCNN笔记](https://blog.csdn.net/xiamentingtao/article/details/78598511)
+
+
+- [ ] **YOLO**
+
+- [ ] **吴恩达Conv卷积，边缘检测部分**
+
+- [ ] **DANet**
+
+
+# 2019.02.29 - 2019.03.03
+- [ ] **DeepLab V3+论文代码**
+
+- [ ] [UNIX Tutorial for Beginners](http://www.ee.surrey.ac.uk/Teaching/Unix/)
 - [ ] [完全解析RNN, Seq2Seq, Attention注意力机制](https://zhuanlan.zhihu.com/p/51383402)
 

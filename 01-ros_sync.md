@@ -100,11 +100,11 @@ $ sudo make install
 
 --------------------------------------------------
 # 4. nvidia GPU FAN PWM
-## 1. 设置多显卡降温
+## 4.1 设置多显卡降温
 ```shell
 $ nvidia-xconfig --enable-all-gpus
 ```
-## 2. xorg.conf
+## 4.2. xorg.conf
 ```shell
 $ cd /etc/X11
 $ cp -p xorg.conf xorg.conf.origin
@@ -119,7 +119,7 @@ Section "Device"
     `Option         "Coolbits" "4"`
 EndSection
 ```
-## 3. 设置主GPU
+## 4.3 设置主GPU
 ```shell
 Section "ServerLayout"
     Identifier     "Layout0"
@@ -129,8 +129,10 @@ Section "ServerLayout"
     InputDevice    "Mouse0" "CorePointer"
 EndSection
 ```
-## 4. 重启机器
+## 4.4 重启机器
 
+## 4.5 手动修改GPU Fan
+* Nvidia X Server Settings.
 --------------------------------------------------
 # 5. 设置xorg.conf 默认虚拟屏幕
 ```shell
@@ -166,7 +168,7 @@ C/C++ Header                     7            285            358           1380
 CMake                            8             40             31            152
 Bourne Shell                     1              1              0              3
 -------------------------------------------------------------------------------
-SUM:                            23            716           1113           `3746`
+SUM:                            23            716           1113           **3746**
 -------------------------------------------------------------------------------
 ```
 
