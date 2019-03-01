@@ -16,6 +16,9 @@
 
 # 12. [COS_Net.jpg]
 
+![COS_Net.jpg](https://github.com/kinglintianxia/note_book/blob/master/imgs/COS_Net.jpg)
+
+
 ## 使用ResNet实现的分割网络效果state-of-art. 
 
 ------------------
@@ -396,7 +399,22 @@ By dividing it into (2×2) sections (because the output size is 2×2) we get:
 
 
 ### `RoIAlign`
-> 
+1. unquantized (2×2) sections:
+
+![](https://github.com/kinglintianxia/note_book/blob/master/imgs/roi0.png)
+
+2. Sampling locations:
+
+![](https://github.com/kinglintianxia/note_book/blob/master/imgs/roi1.png)
+
+3. Bilinear interpolated values:
+
+![](https://github.com/kinglintianxia/note_book/blob/master/imgs/roi2.png)
+
+4. Max pooling output:
+
+![](https://github.com/kinglintianxia/note_book/blob/master/imgs/roi3.png)
+
 
 * [Mask R-CNN 论文翻译](https://alvinzhu.xyz/2017/10/07/mask-r-cnn/#fn:18)
 * [Mask R-CNN完整翻译](https://blog.csdn.net/myGFZ/article/details/79136610)
