@@ -343,7 +343,6 @@ L41-L53
 * See `update 2019.02.27`.
 * [Faster-rcnn详解](https://blog.csdn.net/WZZ18191171661/article/details/79439212)
 
-# ==TODO==
 
 # 2019.02.28
 ## CSDN翻译专栏
@@ -370,7 +369,7 @@ https://github.com/jasjeetIM/Mask-RCNN [Caffe]
 
 - [x] **Mask_R-CNN.mp4**
 
-- [ ] **maskrcnn_slides.pdf**
+- [x] **maskrcnn_slides.pdf**
 * [region-of-interest-pooling-explained](https://deepsense.ai/region-of-interest-pooling-explained/)
 * Backbone (`ResNeXt`): +1:6APbb
 
@@ -414,6 +413,9 @@ By dividing it into (2×2) sections (because the output size is 2×2) we get:
 4. Max pooling output:
 
 ![](https://github.com/kinglintianxia/note_book/blob/master/imgs/roi3.png)
+
+
+# ==TODO==
 
 
 * [Mask R-CNN 论文翻译](https://alvinzhu.xyz/2017/10/07/mask-r-cnn/#fn:18)
