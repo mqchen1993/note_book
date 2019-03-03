@@ -499,16 +499,16 @@ BN-Inception  	| 2.03
 * The Network output is:
 
 
-output		|	meaning					| example 'pedestrian', 'car', 'motorcycle'	|
-------		|	------					|	------		|	------
-Pc			|	Is there any object		|	1			|	0
-bx			|	bbox center x			|	0.5			|	?	'Don't care'
-by			|	bbox center y			|	0.5			|	?	'Don't care'
-bh			|	bbox height				|	0.4			|	?	'Don't care'
-bw			|	bbox width				|  	0.6			|	?	'Don't care'
-c1			|	class 1 prob			|	0			|	?	'Don't care'
-c2			|	class 2 prob			|	1			|	?	'Don't care'
-c3			|	class 3 prob			|	0			|	?	'Don't care'
+output		|	meaning					| example 'pedestrian', 'car', 'motorcycle'	|	
+------		|	------					|	------		|	------					|
+Pc			|	Is there any object		|	1			|	0						|
+bx			|	bbox center x			|	0.5			|	?	'Don't care'		|
+by			|	bbox center y			|	0.5			|	?	'Don't care'		|
+bh			|	bbox height				|	0.4			|	?	'Don't care'		|
+bw			|	bbox width				|  	0.6			|	?	'Don't care'		|
+c1			|	class 1 prob			|	0			|	?	'Don't care'		|
+c2			|	class 2 prob			|	1			|	?	'Don't care'		|
+c3			|	class 3 prob			|	0			|	?	'Don't care'		|
 
 
 * The loss may be:
