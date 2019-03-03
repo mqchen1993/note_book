@@ -21,7 +21,7 @@
 
 # 11. 将卷积操作的 'bias'值换成相应区域的边缘图像试试。
 
-# 12. [COS_Net.jpg]
+# 12. COS_Net.jpg
 
 #　13. 分割网络输出层21channels，每个channels表达一个类别的mask， 将分类和分割解耦。
 
@@ -356,7 +356,7 @@ L41-L53
 [CSDN翻译专栏](https://blog.csdn.net/quincuntial/article/details/77263607)
 
 # 2019.02.29 - 2019.03.03
-- [ ] **Mask-RCNN**
+## Mask R-CNN
 * 专知语义分割专栏
 ```python
 Mask-RCNN [https://arxiv.org/pdf/1703.06870.pdf]
@@ -378,7 +378,7 @@ https://github.com/jasjeetIM/Mask-RCNN [Caffe]
 
 - [x] **maskrcnn_slides.pdf**
 * [region-of-interest-pooling-explained](https://deepsense.ai/region-of-interest-pooling-explained/)
-* Backbone (`ResNeXt`): +1:6APbb
+* Backbone (`ResNeXt`): +1.6 AP(bbox)
 
 ## `RoIPooling` & `RoIAlign`
 ### `RoIPooling`
@@ -428,6 +428,7 @@ By dividing it into (2×2) sections (because the output size is 2×2) we get:
 ###
 - [x] **Mask-RCNN-Arc-How-RoI_Pooling-RoI_Warping_RoI-Align_Work.mp4**
 * ROI Pooling和ROIAlign最大的区别是：前者使用了两次量化操作，而后者并没有采用量化操作，使用了线性插值算法，具体的解释如下所示:
+
 ![ROIPooling](https://img-blog.csdn.net/20180306110240257)
 ![ROIAlign](https://img-blog.csdn.net/20180306110334767)
 
@@ -457,9 +458,12 @@ By dividing it into (2×2) sections (because the output size is 2×2) we get:
 > 常规的`ROI Pooling`的反向传播公式如下：
 
 ![](http://1.file.leanote.top/59fbd202ab644135b00006fa/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20171103101817.png?e=1551535688&token=ym9ZIrtxjozPN4G9he3-FHPOPxAe-OQmxzol5EOk:HQGMn_aJNffPMlsmOIilYXI1jR8)
+
 > 这里，xi代表池化前特征图上的像素点；yrj代表池化后的第r个候选区域的第j个点；i*(r,j)代表点yrj像素值的来源（最大池化的时候选出的最大像素值所在点的坐标）。由上式可以看出，只有当池化后某一个点的像素值在池化过程中采用了当前点Xi的像素值（即满足i=i*(r，j)），才在xi处回传梯度。
 > 类比于ROIPooling，`ROIAlign的反向传播`需要作出稍许修改：首先，在ROIAlign中，xi*（r,j）是一个浮点数的坐标位置(前向传播时计算出来的采样点)，在池化前的特征图中，每一个与 xi*(r,j) 横纵坐标均小于1的点都应该接受与此对应的点yrj回传的梯度，故ROI Align 的反向传播公式如下: 
+
 ![](http://1.file.leanote.top/59fbe350ab644137db000a4e/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20171103113216.png?e=1551535689&token=ym9ZIrtxjozPN4G9he3-FHPOPxAe-OQmxzol5EOk:8JFZp9cEc2vf2099pKVB_jqA4rE)
+
 > 上式中，d(.)表示两点之间的距离，Δh和Δw表示 xi 与 xi*(r,j) 横纵坐标的差值，这里作为双线性内插的系数乘在原始的梯度上。
 
 # 2019.03.03
@@ -471,6 +475,7 @@ By dividing it into (2×2) sections (because the output size is 2×2) we get:
 ![](https://github.com/kinglintianxia/note_book/blob/master/imgs/SE_Net.png)
 
 * GFLOPs
+
 网络        		| GFLOPs
 --------   		| -----
 ResNet-50  		| 3.86
