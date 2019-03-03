@@ -483,13 +483,41 @@ ResNet-101 		| 7.58
 ResNet-152 		| 11.30
 BN-Inception  	| 2.03
 
-* ResNet-50 Conv5层没必要加SE模块
+* ResNet-50 `Conv5层`没必要加`SE`模块
+
+
+
+## Conv卷积，边缘检测
+- [ ] **吴恩达Conv卷积，边缘检测部分**
+* 第一周 卷积神经网络-1.2/1.3节
+* Why convolutions:
+1. Parameter sharing.
+2. Sparsity of connections.
+
+### **第三周　目标检测**
+* 跑道检测是`classification with localization`问题。
+* The Network output is:
+
+output		|	meaning					| example 'pedestrian', 'car', 'motorcycle'
+------		|	------					|	------		|	------
+Pc			|	Is there any object		|	1			|	0
+bx			|	bbox center x			|	0.5			|	?	'Don't care'
+by			|	bbox center y			|	0.5			|	?	'Don't care'
+bh			|	bbox height				|	0.4			|	?	'Don't care'
+bw			|	bbox width				|  	0.6			|	?	'Don't care'
+c1			|	class 1 prob			|	0			|	?	'Don't care'
+c2			|	class 2 prob			|	1			|	?	'Don't care'
+c3			|	class 3 prob			|	0			|	?	'Don't care'
+
+* The loss may be:
+
+loss				|	case
+------				|	------
+sum(y^i-yi)^2		|	y0 = 1
+(y^0-y0)^2			|	y0 = 0
 
 
 # ==TODO==
-
-
-- [ ] **吴恩达Conv卷积，边缘检测部分**
 
 
 - [ ] **YOLO**
