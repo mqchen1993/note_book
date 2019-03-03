@@ -1,11 +1,18 @@
 # 1. 修改deeplab，简化语义标签，提高实时性。
+
 # 2. 在MultiNet基础上修改，完成道路分割、车辆、行人等检测。
+
 # 3. 打破FCN Encoder-Decoder架构,设计one step end-to-end网络。预测语义分割每一类物体在图片上的像素轮廓，而不是端到端输出图片。
-# 4. 将pooling层换成边缘检测层试一下效果。
+
+# 4. 将[pooling层]换成[边缘检测层]试一下效果; 能不能让Pooling层在降size的同时，层内参数可训练化（让网络自己选择保留哪些信息，而不仅仅是MaxPooling或AVGPooling）
+
 # 5. 注意力模型
+
 # 6. 现在训练网络都是让网络“猜dog在哪里？在这里”(前向传播), "不对，你离正确答案多远"（计算loss）；“我再猜一下”（反向传播）；能不能设计一种训练结构，告诉网络“这张图中dog在哪里”。
+
 # 7. 在分割网络中加入ROI-Pooling层
 * Input -> ROI Pooling -> FCN
+
 # 8. 在分割网络中加入边缘检测层，结合边缘对score层进行采样分类，当一个轮廓中大于阈值的像素点属于A类，则划为A类。
 
 # 9. 在激活函数Relu等上做文章，让网络逐渐收敛到真值（比如正负二分类），不用softmax和argmax等。
@@ -16,7 +23,7 @@
 
 # 12. [COS_Net.jpg]
 
-![COS_Net.jpg](https://github.com/kinglintianxia/note_book/blob/master/imgs/COS_Net.jpg)
+#　13. 分割网络输出层21channels，每个channels表达一个类别的mask， 将分类和分割解耦。
 
 
 ## 使用ResNet实现的分割网络效果state-of-art. 
@@ -415,19 +422,76 @@ By dividing it into (2×2) sections (because the output size is 2×2) we get:
 ![](https://github.com/kinglintianxia/note_book/blob/master/imgs/roi3.png)
 
 
+# 2019.03.02
+## Mask R-CNN
+
+###
+- [x] **Mask-RCNN-Arc-How-RoI_Pooling-RoI_Warping_RoI-Align_Work.mp4**
+* ROI Pooling和ROIAlign最大的区别是：前者使用了两次量化操作，而后者并没有采用量化操作，使用了线性插值算法，具体的解释如下所示:
+![ROIPooling](https://img-blog.csdn.net/20180306110240257)
+![ROIAlign](https://img-blog.csdn.net/20180306110334767)
+
+###
+- [x] **2017-Mask R-CNN.pdf**
+* [Mask R-CNN 论文翻译](https://alvinzhu.xyz/2017/10/07/mask-r-cnn/#fn:18)
+* [Mask R-CNN完整翻译](https://blog.csdn.net/myGFZ/article/details/79136610)
+* `RoIPool` performs coarse spatial quantizationfor feature extraction. To fix the misalignment, we propose a simple, quantization-free layer, called `RoIAlign`, that faithfully preserves exact spatial locations.
+*  Second, we found it essential to decouple mask and class prediction: we predict a binary mask for each class independently, without competition among classes, and rely on the network’s RoI classification branch to predict the category. 
+* Our models can run at about 200ms per frame on a GPU, and training on COCO takes one to two days on a single 8-GPU machine. 
+* Instead, our method is based on `parallel prediction of masks and class labels`, which is simpler and more flexible.
+* The `mask branch` has a Km2-dimensional output for `each RoI`, which encodes K binary masks of resolution m × m, one for each of the `K classes`.
+* For an RoI associated with ground-truth class k, Lmask is only defined on the k-th mask (other mask outputs do not contribute to the loss).
+* we rely on the dedicated classification branch to predict the class label used to `select the output mask`. 
+* collapsing it into a `vector representation` that `lacks spatial dimensions`.
+* `RoIPool` is a standard operation for extracting a small feature map (e.g., 7×7) from each RoI
+* non-maximum suppression
+* The `mask branch` can predict K masks per RoI, but we only `use the k-th mask`, where k is the predicted class by the classification branch. The m×m floating-number mask output is then `resized to the RoI size`, and binarized at a threshold of 0.5
+
+* 2016-FCIS.pdf
+* 2016-Segment Proposal.pdf
+* 2015-DeepMask.pdf
+
+###
+- [x] [Mask RCNN笔记](https://blog.csdn.net/xiamentingtao/article/details/78598511)
+* ROI Align 的反向传播
+> 常规的`ROI Pooling`的反向传播公式如下：
+
+![](http://1.file.leanote.top/59fbd202ab644135b00006fa/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20171103101817.png?e=1551535688&token=ym9ZIrtxjozPN4G9he3-FHPOPxAe-OQmxzol5EOk:HQGMn_aJNffPMlsmOIilYXI1jR8)
+> 这里，xi代表池化前特征图上的像素点；yrj代表池化后的第r个候选区域的第j个点；i*(r,j)代表点yrj像素值的来源（最大池化的时候选出的最大像素值所在点的坐标）。由上式可以看出，只有当池化后某一个点的像素值在池化过程中采用了当前点Xi的像素值（即满足i=i*(r，j)），才在xi处回传梯度。
+> 类比于ROIPooling，`ROIAlign的反向传播`需要作出稍许修改：首先，在ROIAlign中，xi*（r,j）是一个浮点数的坐标位置(前向传播时计算出来的采样点)，在池化前的特征图中，每一个与 xi*(r,j) 横纵坐标均小于1的点都应该接受与此对应的点yrj回传的梯度，故ROI Align 的反向传播公式如下: 
+![](http://1.file.leanote.top/59fbe350ab644137db000a4e/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20171103113216.png?e=1551535689&token=ym9ZIrtxjozPN4G9he3-FHPOPxAe-OQmxzol5EOk:8JFZp9cEc2vf2099pKVB_jqA4rE)
+> 上式中，d(.)表示两点之间的距离，Δh和Δw表示 xi 与 xi*(r,j) 横纵坐标的差值，这里作为双线性内插的系数乘在原始的梯度上。
+
+# 2019.03.03
+## SE-Net
+- [x] **85-ImageNet冠军模型SE-Net详解**
+* SE-Net: `channel relationship`; GoogleNet: `spatial relationship`
+* Mini-batch data sampling: 按照`类别`，不是按照`图像`进行训练。
+* ResNet & SE_Net
+![](https://github.com/kinglintianxia/note_book/blob/master/imgs/SE_Net.png)
+
+* GFLOPs
+网络        		| GFLOPs
+--------   		| -----
+ResNet-50  		| 3.86
+ResNet-101 		| 7.58
+ResNet-152 		| 11.30
+BN-Inception  	| 2.03
+
+* ResNet-50 Conv5层没必要加SE模块
+
+
 # ==TODO==
 
 
-* [Mask R-CNN 论文翻译](https://alvinzhu.xyz/2017/10/07/mask-r-cnn/#fn:18)
-* [Mask R-CNN完整翻译](https://blog.csdn.net/myGFZ/article/details/79136610)
-* [Mask RCNN笔记](https://blog.csdn.net/xiamentingtao/article/details/78598511)
+- [ ] **吴恩达Conv卷积，边缘检测部分**
 
 
 - [ ] **YOLO**
 
-- [ ] **吴恩达Conv卷积，边缘检测部分**
 
 - [ ] **DANet**
+
 
 
 # 2019.02.29 - 2019.03.03
@@ -435,4 +499,4 @@ By dividing it into (2×2) sections (because the output size is 2×2) we get:
 
 - [ ] [UNIX Tutorial for Beginners](http://www.ee.surrey.ac.uk/Teaching/Unix/)
 - [ ] [完全解析RNN, Seq2Seq, Attention注意力机制](https://zhuanlan.zhihu.com/p/51383402)
-
+.
