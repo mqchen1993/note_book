@@ -488,7 +488,7 @@ BN-Inception  	| 2.03
 
 
 ## Conv卷积，边缘检测
-- [ ] **吴恩达Conv卷积，边缘检测部分**
+- [x] **吴恩达Conv卷积，边缘检测部分**
 * 第一周 卷积神经网络-1.2/1.3节
 * Why convolutions:
 1. Parameter sharing.
@@ -518,11 +518,122 @@ loss				|	case
 sum(y^i-yi)^2		|	y0 = 1
 (y^0-y0)^2			|	y0 = 0
 
+* [bx, by, bh, bw] are parameted relative to the grid cell.
+
+
+
+## YOLO
+- [x] **跑通YOLO**
+* [YOLO](https://pjreddie.com/darknet/yolo/)
+* Darknet is an open source neural network framework written in `C and CUDA`. It is fast, easy to install, and supports `CPU and GPU computation`.
+
+### Build & run
+```shell
+# Build with CPU
+$ git clone https://github.com/pjreddie/darknet
+$ cd darknet
+$ make
+$ wget https://pjreddie.com/media/files/yolov3.weights
+# run with CPU
+$ ./darknet detect cfg/yolov3.cfg weights/yolov3.weights data/dog.jpg
+
+# Build with GPU
+## change the first line of the `Makefile`
+$ GPU=1
+$ OPENCV=1
+## run with GPU
+$ ./darknet detector test cfg/coco.data cfg/yolov3.cfg weights/yolov3.weights data/dog.jpg 
+$ ./darknet detect cfg/yolov3.cfg weights/yolov3.weights data/dog.jpg
+## use GPU 1
+$ ./darknet -i 1 detect cfg/yolov3.cfg weights/yolov3.weights data/dog.jpg
+## run with video file
+$ ./darknet detector demo cfg/coco.data cfg/yolov3.cfg weights/yolov3.weights data/1.avi 
+```
+
+* Where `x, y, width, and height` are `relative to the image's width and height`.
+
+
+# 2019.03.03
+## YOLOv3
+- [x] [How to implement a YOLO (v3) object detector from scratch in PyTorch: Part 1](https://blog.paperspace.com/how-to-implement-a-yolo-object-detector-in-pytorch/)
+* `YOLO`, `SSD`, `Mask RCNN` and `RetinaNet`.
+
+### What is YOLO?
+* YOLO makes use of only convolutional layers, making it a fully convolutional network (FCN). It has `75 convolutional layers`, with `skip connections` and `upsampling` layers. `No form of pooling` is used, and a convolutional layer with stride 2 is used to downsample the feature maps. 
+* `Being a FCN`, YOLO is invariant to the size of the input image. However, `in practice`, we might want to stick to a `constant input size`:
+> Process our images in `batches` (images in batches can be processed in parallel by the GPU, leading to speed boosts), we need to have all images of fixed height and width. 
+* The network `downsamples` the image by a factor called the **stride** of the network.
+
+### Interpreting the output
+* Now, the first thing to notice is `our output is a feature map`.
+* `Depth-wise`, we have `(B x (5 + C)) entries` in the feature map.
+> `B` represents the number of bounding boxes each cell can predict.  Each of the bounding boxes have 5 + C attributes, which describe the `center coordinates`, the `dimensions`, the `objectness score` and `C class confidences` for each bounding box. YOLO v3 predicts `3 bounding boxes for every cell`.
+* To do that, we `divide` the `input image` into `a grid of dimensions` equal to that of `the final feature map`.
+> Let us consider an example below, where the input image is 416 x 416, and stride of the network is 32. As pointed earlier, the dimensions of the feature map will be 13 x 13. We then divide the input image into 13 x 13 cells.
+
+![](https://blog.paperspace.com/content/images/2018/04/yolo-5.png)
+> Then, the cell (on the input image) containing `the center of the ground truth box` of an object is chosen to be the one `responsible for predicting the object`. In the image, it is the cell which marked `red`, which contains the center of the ground truth box (marked yellow).
+* We divide the `input image` into a `grid` just to determine which cell of the prediction `feature map` is `responsible for prediction`.
+
+### Anchor Boxes
+* It might make sense to predict the width and the height of the bounding box, but `in practice`, that leads to `unstable gradients` during training. `Instead`, most of the modern object detectors predict log-space transforms, or `simply` offsets to pre-defined default bounding boxes called `anchors`.
+* The bounding box `responsible for detecting the dog` will be the one whose anchor has the `highest IoU` with the `ground truth box`.
+
+### Making Predictions
+* The following formulae describe how the network output is transformed to obtain bounding box predictions.
+
+！[](https://blog.paperspace.com/content/images/2018/04/Screen-Shot-2018-04-10-at-3.18.08-PM.png)
+> `bx, by, bw, bh` are the x,y center co-ordinates(坐标), width and height of our prediction. `tx, ty, tw, th` is what the `network outputs`. `cx and cy` are the top-left co-ordinates of the grid. `pw and ph` are anchors dimensions for the box.
+
+### Center Coordinates
+* Notice we are running our `center coordinates prediction` through a `sigmoid` function. This forces the value of the `output` to be between `0 and 1`. 
+> For example, consider the case of our `dog image`. If the `prediction for center` is (0.4, 0.7), then this means that the center lies at (6.4, 6.7) on the 13 x 13 feature map. (Since the top-left co-ordinates of the red cell are (6,6)).
+
+### Dimensions of the Bounding Box
+* The `dimensions(bw, bh)` of the bounding box are predicted by applying a log-space transform to the `output(tw, th)` and then multiplying with an `anchor(pw, ph)`.
+$$ {bw = pw*e^{tw}}, {bh = ph*e^{th}}  $$
+
+![](https://blog.paperspace.com/content/images/2018/04/yolo-regression-1.png)
+
+### Objectness Score
+* `Object score` represents the `probability` that an object is contained inside a bounding box. It should be nearly 1 for the red and the neighboring grids, whereas almost 0 for, say, the grid at the corners.
+
+* The `objectness score` is also passed through a `sigmoid`, as it is to be interpreted as a `probability`.
+
+### Class Confidences
+* Class confidences represent the probabilities of the detected object belonging to a particular class (Dog, cat, banana, car etc).
+* Before v3, YOLO used to `softmax` the class scores.
+* In v3, and authors have opted for using `sigmoid` instead.
+* The reason is that `Softmaxing` class scores assume that the classes are `mutually exclusive`(相互排斥).
+> In simple words, if an object belongs to one class, then it's guaranteed it cannot belong to another class. This is true for COCO database on which we will base our detector.
+> However, this assumptions may not hold when we have classes like `Women` and `Person`. This is the reason that authors have steered clear of using a Softmax activation.
+
+### Prediction across different scales.
+* YOLO v3 makes prediction across `3 different scales`. The detection layer is used make detection at feature maps of three different sizes, having `strides 32, 16, 8 respectively`. This means, with an `input of 416 x 416`, we make detections on `scales 13 x 13, 26 x 26 and 52 x 52`.
+* The network downsamples the input image until the first detection layer, where a detection is made using feature maps of a layer with stride 32. Further, layers are upsampled by a factor of 2 and concatenated with feature maps of a previous layers having identical feature map sizes. Another detection is now made at layer with stride 16. The same upsampling procedure is repeated, and a final detection is made at the layer of stride 8.
+
+![](https://blog.paperspace.com/content/images/2018/04/yolo_Scales-1.png)
+
+* `Upsampling` can help the network learn `fine-grained(细粒度) features` which are instrumental for detecting `small objects`.
+
+### Output Processing
+* For an image of size `416 x 416`, YOLO predicts ((52 x 52) + (26 x 26) + 13 x 13)) x 3 = `10647 bounding boxes`. 
+* Thresholding by Object Confidence.
+* Non-maximum Suppression.
+
+# 2019.03.05
+## YOLOv3
+- [x] [How to implement a YOLO (v3) object detector from scratch in PyTorch: Part 2](https://blog.paperspace.com/how-to-implement-a-yolo-v3-object-detector-from-scratch-in-pytorch-part-2/)
+
+
+- [ ] [YOLOv3网络结构细致解析](https://blog.csdn.net/sum_nap/article/details/80568873)
+- [ ] [yolo系列之yolo v3 深度解析](https://blog.csdn.net/leviopku/article/details/82660381)
+- [ ] [基于keras-yolov3，原理及代码细节的理解](https://blog.csdn.net/KKKSQJ/article/details/83587138)
+- [ ] [YOLOv3 全文翻译](https://zhuanlan.zhihu.com/p/34945787)
+- [ ] [YOLO从零开始：基于YOLOv3的行人检测入门指南](https://zhuanlan.zhihu.com/p/47196727)
+
 
 # ==TODO==
-
-
-- [ ] **YOLO**
 
 
 - [ ] **DANet**
