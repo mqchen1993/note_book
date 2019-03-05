@@ -496,8 +496,7 @@ BN-Inception  	| 2.03
 
 ### **第三周　目标检测**
 * 跑道检测是`classification with localization`问题。
-* The Network output is:
-
+* The Network output is:<br>
 
 |	output		|	meaning					| example 'pedestrian', 'car', 'motorcycle'	|	
 |	------		|	------					|	------		|	------					|
