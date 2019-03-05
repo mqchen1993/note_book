@@ -510,11 +510,6 @@ BN-Inception  	| 2.03
 |	c3			|	class 3 prob			|	0			|	?	'Don't care'		|
 
 
-|左对齐|居中对齐|右对齐|
-|:-    |:------:|-:|
-|左对齐列|居中对齐列|右对齐列|
-|1|2|3|
-
 
 * The loss may be:
 
@@ -636,9 +631,10 @@ $$ {bw = pw*e^{tw}}, {bh = ph*e^{th}}  $$
 
 ### layer filters size input output
 
-```python
-0 conv 32 3 x 3 / 1 416 x 416 x 3 -> 416 x 416 x 32 0.299 BFLOPs
-1 conv 64 3 x 3 / 2 416 x 416 x 32 -> 208 x 208 x 64 1.595 BFLOPs
+| layer cnt	|	filters			|	input		| 	ouput		 |	BFLOPs		|
+|	------	|	------			|	------		|	------		 |	------		|
+0 conv 32 3 x 3 / 1  416 x 416 x 3 -> 416 x 416 x 32  0.299 BFLOPs	
+1 conv 64 3 x 3 / 2  416 x 416 x 32 -> 208 x 208 x 64  1.595 BFLOPs	
 2 conv 32 1 x 1 / 1 208 x 208 x 64 -> 208 x 208 x 32 0.177 BFLOPs
 3 conv 64 3 x 3 / 1 208 x 208 x 32 -> 208 x 208 x 64 1.595 BFLOPs
 4 res 1 208 x 208 x 64 -> 208 x 208 x 64
