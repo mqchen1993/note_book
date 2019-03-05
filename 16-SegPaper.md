@@ -498,7 +498,7 @@ BN-Inception  	| 2.03
 * 跑道检测是`classification with localization`问题。
 * The Network output is:<br>
 
-|	output		|	meaning					| example 'pedestrian', 'car', 'motorcycle'	|	
+|	output		|	meaning					| example 'pedestrian', 'car', 'motorcycle'	|	|	
 |	------		|	------					|	------		|	------					|
 |	Pc			|	Is there any object		|	1			|	0						|
 |	bx			|	bbox center x			|	0.5			|	?	'Don't care'		|
