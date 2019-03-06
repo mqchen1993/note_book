@@ -1233,6 +1233,8 @@ $ ./darknet detector test cfg/voc-person.data cfg/yolov3-voc-person.cfg backup_p
 
 * Visualization of Attention Module:
 
+![](https://github.com/kinglintianxia/note_book/blob/master/imgs/DANet_Vis.png)
+
 ![](https://img-blog.csdn.net/20181017154534719?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21pZWxlaXpoaTA1MjI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
 * 对于通道注意力模块来说，很难直接给出关于注意力图的可视化理解:
@@ -1246,8 +1248,15 @@ $ ./darknet detector test cfg/voc-person.data cfg/yolov3-voc-person.cfg backup_p
 
 # ==TODO==
 
-# 2019.02.29 - 2019.03.03
+# 2019.03.07
 - [ ] **DeepLab V3+论文代码**
+
+
+
+
+
+
+
 
 - [ ] [UNIX Tutorial for Beginners](http://www.ee.surrey.ac.uk/Teaching/Unix/)
 - [ ] [完全解析RNN, Seq2Seq, Attention注意力机制](https://zhuanlan.zhihu.com/p/51383402)
