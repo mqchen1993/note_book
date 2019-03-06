@@ -27,7 +27,10 @@
 
 # 14. yolo检测道路主要类别+语义分割道路，实时跑在北三环数据集上。
 
-## 使用ResNet实现的分割网络效果state-of-art. 
+# 15. `DANet` + `DeepLabV3+` + `# 13.` + `Pooling -> Conv`
+
+
+## 使用ResNet实现的分割网络效果state-of-the-art(SOTA). 
 
 ------------------
 # 2019.01.08
@@ -472,6 +475,12 @@ By dividing it into (2×2) sections (because the output size is 2×2) we get:
 - [x] **85-ImageNet冠军模型SE-Net详解**
 * SE-Net: `channel relationship`; GoogleNet: `spatial relationship`
 * Mini-batch data sampling: 按照`类别`，不是按照`图像`进行训练。
+* SE-module流程：
+1.  将输入特征进行`Global AVE pooling`，得到 `1*1* Channel` 
+2. 然后`bottleneck`特征交互一下，先压缩 channel数，再重构回channel数最后接个 `sigmoid`，生成channel 间`0~1`的 attention weights，最后scale乘回原输入特征.
+
+![](https://pic4.zhimg.com/80/v2-2e8c37ad7e40b7f1cdfd81ecbae4e95f_hd.jpg)
+
 * ResNet & SE_Net
 ![](https://github.com/kinglintianxia/note_book/blob/master/imgs/SE_Net.png)
 
@@ -540,9 +549,12 @@ $ ./darknet detect cfg/yolov3.cfg weights/yolov3.weights data/dog.jpg
 
 # Build with GPU
 ## change the first line of the `Makefile`
-$ GPU=1
-$ OPENCV=1
-$ ARCH= -gencode arch=compute_30,code=sm_30 \
+GPU=1		# build with CUDA to accelerate by using GPU (CUDA should be in /usr/local/cuda)
+CUDNN=1		# build with cuDNN v5-v7 to accelerate training by using GPU ( /usr/local/cudnn)
+OPENCV=1	# build with OpenCV 3.x/2.4.x - allows to detect on video files and video streams
+OPENMP=1	# build with OpenMP support to accelerate Yolo by using multi-core CPU
+DEBUG=0
+ARCH= -gencode arch=compute_30,code=sm_30 \
       -gencode arch=compute_35,code=sm_35 \
       -gencode arch=compute_50,code=[sm_50,compute_50] \
       -gencode arch=compute_52,code=[sm_52,compute_52] \
@@ -863,7 +875,7 @@ layer     filters    size              input                output
    74 res   71                  19 x  19 x1024   ->    19 x  19 x1024
    75 conv    512  1 x 1 / 1    19 x  19 x1024   ->    19 x  19 x 512  0.379 BFLOPs
    76 conv   1024  3 x 3 / 1    19 x  19 x 512   ->    19 x  19 x1024  3.407 BFLOPs
-   77 conv    512  1 x 1 / 1    19 x  19 x1024   ->    19 x  19 x 512  0.379 BFLOPs
+   77 conv    512  1 x 1 / 1    19 x  19 x102![](https://github.com/kinglintianxia/note_book/blob/master/imgs/SE_Net.png)4   ->    19 x  19 x 512  0.379 BFLOPs
    78 conv   1024  3 x 3 / 1    19 x  19 x 512   ->    19 x  19 x1024  3.407 BFLOPs
    79 conv    512  1 x 1 / 1    19 x  19 x1024   ->    19 x  19 x 512  0.379 BFLOPs
    80 conv   1024  3 x 3 / 1    19 x  19 x 512   ->    19 x  19 x1024  3.407 BFLOPs
@@ -979,7 +991,7 @@ class_loss = K.sum(class_loss) / mf
 
 
 ## YOLOv3
-- [ ] [YOLO从零开始：基于YOLOv3的行人检测入门指南](https://zhuanlan.zhihu.com/p/47196727)
+- [x] [YOLO从零开始：基于YOLOv3的行人检测入门指南](https://zhuanlan.zhihu.com/p/47196727)
 ### 通过`voc_label.py`转化`voc数据`格式为`yolo支持`的格式.
 ### 10、性能检测
 * 计算mAp
@@ -1002,17 +1014,17 @@ $ ./darknet detector valid cfg/voc.data cfg/yolov3-voc.cfg backup/yolov3-voc_fin
 ```python
 Region xx: cfg文件中yolo-layer的索引；
 
-Avg IOU:   当前迭代中，预测的box与标注的box的平均交并比，越大越好，期望数值为1；
+Avg IOU:  		# 当前迭代中，预测的box与标注的box的平均交并比，越大越好，期望数值为1；
 
-Class:        标注物体的分类准确率，越大越好，期望数值为1；
+Class:        	# 标注物体的分类准确率，越大越好，期望数值为1；
 
-obj:            越大越好，期望数值为1；
+obj:            # 越大越好，期望数值为1；
 
-No obj:      越小越好；
+No obj:      	# 越小越好；
 
-.5R:            以IOU=0.5为阈值时候的recall; recall = 检出的正样本/实际的正样本
+.5R:            # 以IOU=0.5为阈值时候的recall; recall = 检出的正样本/实际的正样本
 
-0.75R:         以IOU=0.75为阈值时候的recall;
+0.75R:         	# 以IOU=0.75为阈值时候的recall;
 
 count:        正样本数目。
 ```
@@ -1102,7 +1114,18 @@ max_batches = 80200
 
 7. 训练
 ```shell
+## Train
 $ ./darknet detector train cfg/voc-person.data cfg/yolov3-voc-person.cfg weights/darknet53.conv.74 -gpus 0,1 |tee -a backup_person/train_voc.txt
+
+## Restart training from a checkpoint:
+$ ./darknet detector train cfg/voc-person.data cfg/yolov3-voc-person.cfg backup_person/yolov3-voc-person.backup -gpus 0,1
+
+## Test NetWork
+# Modify 'cfg/yolov3-voc-person.cfg'
+# Testing
+ batch=1
+ subdivisions=1
+$ ./darknet detector test cfg/voc-person.data cfg/yolov3-voc-person.cfg backup_person/yolov3-voc-person.backup data/person6.jpg
 ```
 
 8. 用脚本`analyse.py`对`训练日志train7-loss.txt`的训练过程可视化。
@@ -1110,8 +1133,115 @@ $ ./darknet detector train cfg/voc-person.data cfg/yolov3-voc-person.cfg weights
 
 # ==TODO==
 
+# 2019.03.06
+## DANet
+* [github](https://github.com/junfu1115/DANet)
+* [CityScapes detailed-results](https://www.cityscapes-dataset.com/detailed-results/)
 
-- [ ] **DANet**
+- [x] [DANet&CCNet](https://segmentfault.com/a/1190000018271713)
+* 两篇文章都是将self-attention机制应用到分割当中，扩大感受野。第二篇文章采用了更巧妙的方法来减少参数。
+* `self-attention`在分割中应用的大致思想是：`特征图`与`特征图的转置`进行矩阵相乘，由于特征图有`channel维度`，相当于是每个像素与另外每个元素都进行`点乘操作`，而向量的点乘几何意义为计算`两个向量的相似度`，两个向量越相似，它们点乘越大。看下图，特征图转置与特征图矩阵相乘后用softmax进行归一化就得到了`Attention map S`。S再与特征图的转置进行矩阵相乘，这个操作`把相关性信息重新分布到原始特征图上`，最后再将这个信息与特征图A相加，得到最终输出，这个输出结合了`整张图的相关性结果`。
+
+![](https://i.loli.net/2019/02/25/5c73485641635.png)
+
+* 整个网络的框架如下图：非常简单，特征提取->attention module->上采样得到分割图
+
+![](https://c2.staticflickr.com/8/7896/40180410623_4f9679fd0e_c.jpg)
+
+> 除了上面说的那一部分attention，作者还加了`蓝色channel attention`，在这里计算特征图与特征图转置矩阵相乘操作时，相乘的顺序调换了一下，这相当于是让channel与channel之间进行点乘操作，计算channel之间的相似性，在这里我认为每张channel map代表了不同类别，这样让类别与类别计算距离，来进行辅助。
+
+## DANet
+- [x] [几篇较新的计算机视觉Self-Attention](https://zhuanlan.zhihu.com/p/44031466?utm_source=wechat_session&utm_medium=social&utm_oi=963402370776072192&from=timeline&isappinstalled=0)
+* 总的来说，就是区域权值学习问题：
+1. `Hard-attention`，就是0/1问题，哪些区域是被 attentioned，哪些区域不关注.
+2. `Soft-attention`，[0,1]间连续分布问题，每个区域被关注的程度高低，用0~1的score表示.
+3. `Self-attention`自注意力，就是 feature map 间的自主学习，分配权重（可以是 spatial，可以是 temporal，也可以是 channel间）
+
+### Non-local NN, CVPR2018
+* `主要思想`也很简单，CNN中的 convolution单元每次只关注`邻域 kernel size 的区域`，就算后期感受野越来越大，终究还是局部区域的运算，这样就`忽略了全局`其他片区（比如很远的像素）对当前区域的贡献。
+* 所以 `non-local blocks` 要做的是，`捕获这种 long-range关系`：对于`2D图像`，就是图像中任何像素对当前像素的关系权值；对于`3D视频`，就是所有帧中的所有像素，对当前帧的像素的关系权值。
+* **网络框架图!!!**:
+
+![](https://pic4.zhimg.com/80/v2-b7805f52179e0313c97b67984866a98f_hd.jpg)
+* 在这里简单说说在DL框架中最好实现的 Matmul 方式：
+1. 首先对输入的 feature map X 进行线性映射（说白了就是 1*1*1 卷积，来压缩通道数），然后得到 \theta，\phi，g 特征
+2. 通过reshape操作，强行合并上述的三个特征除通道数外的维度，然后对 \theta和\phi 进行矩阵点乘操作，得到类似协方差矩阵的东西（这个过程很重要，计算出特征中的自相关性，即得到每帧中每个像素对其他所有帧所有像素的关系）
+3. 然后对自相关特征 以列or以行（具体看矩阵 g 的形式而定） 进行 Softmax 操作，得到0~1的weights，这里就是我们需要的 Self-attention 系数
+4. 最后将 attention系数，对应乘回特征矩阵 g 中，然后`再上扩channel数`，与原输入feature map X `残差`一下，完整的 bottleneck.
+
+### Interaction-aware Attention, ECCV2018
+* 就是在 non-local block 的协方差矩阵基础上，设计了基于 PCA 的新loss，更好地进行特征交互。作者认为，这个过程，特征会在channel维度进行更好的 non-local interact，故称为 Interaction-aware attention.
+* 文中不直接使用`协方差矩阵的特征值分解`来实现, 通过`PCA`来获得 `Attention weights`
+* 有点`小区别`是，在 X 和 Watten 点乘后，`还加了个b项`，文中说这里可看作 data central processing (subtracting mean) of PCA.
+
+### CBAM: Convolutional Block Attention Module, ECCV2018
+* 基于 `SE-Net`中的 Squeeze-and-Excitation module 来进行进一步拓展
+* 文中把 `channel-wise attention` 看成是教网络 `Look 'what’`；而`spatial attention` 看成是教网络 `Look 'where'`，所以它比 SE Module 的主要优势就多了后者.
+* 先看看SE-module流程：
+1. 将输入特征进行`Global AVE pooling`，得到 `1*1* Channel` 
+2. 然后`bottleneck`特征交互一下，先压缩 channel数，再重构回channel数最后接个 `sigmoid`，生成channel 间`0~1`的 attention weights，最后scale乘回原输入特征.
+
+![](https://pic4.zhimg.com/80/v2-2e8c37ad7e40b7f1cdfd81ecbae4e95f_hd.jpg)
+
+* 再看看CBAM：
+1. `Channel Attention Module`: 基本和 SE-module 是一致的，就额外加入了 Maxpool 的 branch。在 Sigmoid 前，两个 branch 进行 element-wise summation 融合。
+2. `Spatial Attention Module`: 对输入特征进行 channel 间的 AVE 和 Max pooling，然后 concatenation，再来个7*7大卷积，最后`Sigmoid`.
+
+！[](https://pic1.zhimg.com/80/v2-a5ada5fb9ee0355b44e6a78f81ac1c58_hd.jpg)
+
+### DANet, CVPR2019
+* 很早就挂在了arXiv，`最近被CVPR2019接收`，把`Self-attention`的思想用在图像分割，可通过`long-range上下文关系`更好地做到精准分割。
+* 把deep feature map进行`spatial-wise self-attention`，同时也进行`channel-wise self-attetnion`，最后将两个结果进行`element-wise sum`融合。
+* 好处是：借鉴CBAM`分别进行空间和通道`self-attention的思想上，直接使用了 non-local 的自相关矩阵Matmul的形式进行运算，避免了CBAM手工设计pooling，多层感知器等复杂操作。
+
+
+## DANet
+- [ ] [DANet PPT](https://blog.csdn.net/mieleizhi0522/article/details/83111183) 
+* SOTA(State of the art).
+* 位置注意力模块(spatial-wise self-attention)通过所有位置的特征加权总和选择的性的聚集每个位置的特征，无论距离远近，相似的特征都会相互关联。(**类似于全连接条件随机场CRF**)
+* 通道注意力模块(channel-wise self-attetnion)通过整合所有通道中的相关特征，有选择的性的强调相关联的通道。
+* 基础网络为**DeepLab**
+* **PSPNet** & **DeepLabV3**
+* 位置注意力模块:
+
+![](https://img-blog.csdn.net/20181017154326441?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21pZWxlaXpoaTA1MjI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
+* 通道注意力模块:
+
+![](https://img-blog.csdn.net/20181017154336438?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21pZWxlaXpoaTA1MjI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
+* Position Attention Module:
+
+![](https://img-blog.csdn.net/20181017154404699?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21pZWxlaXpoaTA1MjI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
+* Channel Attention Module:
+
+![](https://img-blog.csdn.net/20181017154426685?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21pZWxlaXpoaTA1MjI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
+* DANet 网络整体结构
+
+![](https://github.com/kinglintianxia/note_book/blob/master/imgs/DANet.png)
+> 我们的注意力模块很简单，可以直接插入现有的FCN模块中，不会增加太多参数，但会有效的增强特征表示。
+
+* Dataset简介：
+
+![](https://img-blog.csdn.net/20181017154447811?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21pZWxlaXpoaTA1MjI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
+* 训练参数和评价指标：
+
+![](https://img-blog.csdn.net/20181017154457283?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21pZWxlaXpoaTA1MjI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
+* Visualization of Attention Module:
+
+![](https://img-blog.csdn.net/20181017154534719?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21pZWxlaXpoaTA1MjI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70s)
+
+* 对于通道注意力模块来说，很难直接给出关于注意力图的可视化理解：
+
+！[](https://img-blog.csdn.net/2018101715462287?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21pZWxlaXpoaTA1MjI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
+* MultiGrid:
+
+![](https://img-blog.csdn.net/20181017154717952?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21pZWxlaXpoaTA1MjI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
 
 
