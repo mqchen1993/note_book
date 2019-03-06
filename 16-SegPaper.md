@@ -839,7 +839,7 @@ layer     filters    size              input                output
    38 conv    256  1 x 1 / 1    38 x  38 x 512   ->    38 x  38 x 256  0.379 BFLOPs
    39 conv    512  3 x 3 / 1    38 x  38 x 256   ->    38 x  38 x 512  3.407 BFLOPs
    40 res   37                  38 x  38 x 512   ->    38 x  38 x 512
-   41 conv    256  1 x 1 / 1    38voc person x  38 x 512   ->    38 x  38 x 256  0.379 BFLOPs
+   41 conv    256  1 x 1 / 1    38 x  38 x 512   ->    38 x  38 x 256  0.379 BFLOPs
    42 conv    512  3 x 3 / 1    38 x  38 x 256   ->    38 x  38 x 512  3.407 BFLOPs
    43 res   40                  38 x  38 x 512   ->    38 x  38 x 512
    44 conv    256  1 x 1 / 1    38 x  38 x 512   ->    38 x  38 x 256  0.379 BFLOPs
@@ -875,7 +875,7 @@ layer     filters    size              input                output
    74 res   71                  19 x  19 x1024   ->    19 x  19 x1024
    75 conv    512  1 x 1 / 1    19 x  19 x1024   ->    19 x  19 x 512  0.379 BFLOPs
    76 conv   1024  3 x 3 / 1    19 x  19 x 512   ->    19 x  19 x1024  3.407 BFLOPs
-   77 conv    512  1 x 1 / 1    19 x  19 x102![](https://github.com/kinglintianxia/note_book/blob/master/imgs/SE_Net.png)4   ->    19 x  19 x 512  0.379 BFLOPs
+   77 conv    512  1 x 1 / 1    19 x  19 x1024   ->    19 x  19 x 512  0.379 BFLOPs
    78 conv   1024  3 x 3 / 1    19 x  19 x 512   ->    19 x  19 x1024  3.407 BFLOPs
    79 conv    512  1 x 1 / 1    19 x  19 x1024   ->    19 x  19 x 512  0.379 BFLOPs
    80 conv   1024  3 x 3 / 1    19 x  19 x 512   ->    19 x  19 x1024  3.407 BFLOPs
@@ -993,7 +993,7 @@ class_loss = K.sum(class_loss) / mf
 ## YOLOv3
 - [x] [YOLO从零开始：基于YOLOv3的行人检测入门指南](https://zhuanlan.zhihu.com/p/47196727)
 ### 通过`voc_label.py`转化`voc数据`格式为`yolo支持`的格式.
-### 10、性能检测
+### 10、性能检测(`AlexeyAB/darknet`)
 * 计算mAp
 > ./darknet detector map cfg/voc.data cfg/yolov3-voc.cfg backup/yolov3-voc_80172.weights
 * 计算recall（2097张的结果）
@@ -1012,7 +1012,7 @@ $ ./darknet detector valid cfg/voc.data cfg/yolov3-voc.cfg backup/yolov3-voc_fin
 * [训练技巧](https://github.com/AlexeyAB/darknet#how-to-train-to-detect-your-custom-objects)
 * [**yolov3训练的集大成者**](https://blog.csdn.net/lilai619/article/details/79695109)
 ```python
-Region xx: cfg文件中yolo-layer的索引；
+Region xx: 		# cfg文件中yolo-layer的索引；
 
 Avg IOU:  		# 当前迭代中，预测的box与标注的box的平均交并比，越大越好，期望数值为1；
 
@@ -1026,11 +1026,11 @@ No obj:      	# 越小越好；
 
 0.75R:         	# 以IOU=0.75为阈值时候的recall;
 
-count:        正样本数目。
+count:        	# 正样本数目。
 ```
 ![cfg](https://img-blog.csdn.net/20180430171058652)
 
-### VOC数据集网络模型
+### YOLOv3结构图(VOC dataset):
 
 ![网络模型](https://img-blog.csdn.net/20180608100212649)
 
@@ -1131,7 +1131,7 @@ $ ./darknet detector test cfg/voc-person.data cfg/yolov3-voc-person.cfg backup_p
 8. 用脚本`analyse.py`对`训练日志train7-loss.txt`的训练过程可视化。
 
 
-# ==TODO==
+
 
 # 2019.03.06
 ## DANet
@@ -1164,10 +1164,10 @@ $ ./darknet detector test cfg/voc-person.data cfg/yolov3-voc-person.cfg backup_p
 
 ![](https://pic4.zhimg.com/80/v2-b7805f52179e0313c97b67984866a98f_hd.jpg)
 * 在这里简单说说在DL框架中最好实现的 Matmul 方式：
-1. 首先对输入的 feature map X 进行线性映射（说白了就是 1*1*1 卷积，来压缩通道数），然后得到 \theta，\phi，g 特征
-2. 通过reshape操作，强行合并上述的三个特征除通道数外的维度，然后对 \theta和\phi 进行矩阵点乘操作，得到类似协方差矩阵的东西（这个过程很重要，计算出特征中的自相关性，即得到每帧中每个像素对其他所有帧所有像素的关系）
-3. 然后对自相关特征 以列or以行（具体看矩阵 g 的形式而定） 进行 Softmax 操作，得到0~1的weights，这里就是我们需要的 Self-attention 系数
-4. 最后将 attention系数，对应乘回特征矩阵 g 中，然后`再上扩channel数`，与原输入feature map X `残差`一下，完整的 bottleneck.
+1. 首先对输入的 feature map X 进行线性映射（说白了就是[1x1x1]卷积来压缩通道数),然后得到$\theta$,$\phi$, $g$ 特征
+2. 通过reshape操作，强行合并上述的三个特征除通道数外的维度，然后对$\theta$和$\phi$进行矩阵点乘操作，得到类似协方差矩阵的东西（这个过程很重要，计算出特征中的自相关性，即得到每帧中每个像素对其他所有帧所有像素的关系）
+3. 然后对自相关特征 以列or以行（具体看矩阵$g$的形式而定） 进行 Softmax 操作，得到0~1的weights，这里就是我们需要的 Self-attention 系数
+4. 最后将 attention系数，对应乘回特征矩阵$g$中，然后`再上扩channel数`，与原输入feature map X `残差`一下，完整的 bottleneck.
 
 ### Interaction-aware Attention, ECCV2018
 * 就是在 non-local block 的协方差矩阵基础上，设计了基于 PCA 的新loss，更好地进行特征交互。作者认为，这个过程，特征会在channel维度进行更好的 non-local interact，故称为 Interaction-aware attention.
@@ -1178,8 +1178,8 @@ $ ./darknet detector test cfg/voc-person.data cfg/yolov3-voc-person.cfg backup_p
 * 基于 `SE-Net`中的 Squeeze-and-Excitation module 来进行进一步拓展
 * 文中把 `channel-wise attention` 看成是教网络 `Look 'what’`；而`spatial attention` 看成是教网络 `Look 'where'`，所以它比 SE Module 的主要优势就多了后者.
 * 先看看SE-module流程：
-1. 将输入特征进行`Global AVE pooling`，得到 `1*1* Channel` 
-2. 然后`bottleneck`特征交互一下，先压缩 channel数，再重构回channel数最后接个 `sigmoid`，生成channel 间`0~1`的 attention weights，最后scale乘回原输入特征.
+1. 将输入特征进行`Global AVE pooling`，得到 `[1x1xChannel]` 
+2. 然后`bottleneck`特征交互一下，`先压缩channel数`，`再重构回channel数`最后接个`sigmoid`，生成channel间`0~1`的 attention weights，最后scale乘回原输入特征.
 
 ![](https://pic4.zhimg.com/80/v2-2e8c37ad7e40b7f1cdfd81ecbae4e95f_hd.jpg)
 
@@ -1187,7 +1187,7 @@ $ ./darknet detector test cfg/voc-person.data cfg/yolov3-voc-person.cfg backup_p
 1. `Channel Attention Module`: 基本和 SE-module 是一致的，就额外加入了 Maxpool 的 branch。在 Sigmoid 前，两个 branch 进行 element-wise summation 融合。
 2. `Spatial Attention Module`: 对输入特征进行 channel 间的 AVE 和 Max pooling，然后 concatenation，再来个7*7大卷积，最后`Sigmoid`.
 
-！[](https://pic1.zhimg.com/80/v2-a5ada5fb9ee0355b44e6a78f81ac1c58_hd.jpg)
+![](https://pic1.zhimg.com/80/v2-a5ada5fb9ee0355b44e6a78f81ac1c58_hd.jpg)
 
 ### DANet, CVPR2019
 * 很早就挂在了arXiv，`最近被CVPR2019接收`，把`Self-attention`的思想用在图像分割，可通过`long-range上下文关系`更好地做到精准分割。
@@ -1196,7 +1196,7 @@ $ ./darknet detector test cfg/voc-person.data cfg/yolov3-voc-person.cfg backup_p
 
 
 ## DANet
-- [ ] [DANet PPT](https://blog.csdn.net/mieleizhi0522/article/details/83111183) 
+- [x] [DANet PPT](https://blog.csdn.net/mieleizhi0522/article/details/83111183) 
 * SOTA(State of the art).
 * 位置注意力模块(spatial-wise self-attention)通过所有位置的特征加权总和选择的性的聚集每个位置的特征，无论距离远近，相似的特征都会相互关联。(**类似于全连接条件随机场CRF**)
 * 通道注意力模块(channel-wise self-attetnion)通过整合所有通道中的相关特征，有选择的性的强调相关联的通道。
@@ -1233,17 +1233,18 @@ $ ./darknet detector test cfg/voc-person.data cfg/yolov3-voc-person.cfg backup_p
 
 * Visualization of Attention Module:
 
-![](https://img-blog.csdn.net/20181017154534719?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21pZWxlaXpoaTA1MjI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70s)
+![](https://img-blog.csdn.net/20181017154534719?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21pZWxlaXpoaTA1MjI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
-* 对于通道注意力模块来说，很难直接给出关于注意力图的可视化理解：
+* 对于通道注意力模块来说，很难直接给出关于注意力图的可视化理解:
 
-！[](https://img-blog.csdn.net/2018101715462287?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21pZWxlaXpoaTA1MjI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+![](https://img-blog.csdn.net/2018101715462287?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21pZWxlaXpoaTA1MjI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
 * MultiGrid:
 
 ![](https://img-blog.csdn.net/20181017154717952?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21pZWxlaXpoaTA1MjI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
 
+# ==TODO==
 
 # 2019.02.29 - 2019.03.03
 - [ ] **DeepLab V3+论文代码**
