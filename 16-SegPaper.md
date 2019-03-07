@@ -66,7 +66,8 @@ Speed (fps) (raw)    :  23.3336
 * [AP wiki](https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#Mean_average_precision)
 * [blog1](https://blog.csdn.net/niaolianjiulin/article/details/53098437)
 * [blog2](https://blog.csdn.net/hysteric314/article/details/54093734)
-* 以recall为横坐标（0~1),precision为纵坐标（0~1）作图。得到一条曲线。该曲线下的面积即为AP.
+* 以recall为横坐标(0,1),precision为纵坐标(0,1)作图。得到一条曲线。该曲线下的面积即为AP.
+
 $$ AP = \int_0^1 {p(r)} dr $$ 
 
 # 2019.01.14
@@ -158,9 +159,9 @@ $$ AP = \int_0^1 {p(r)} dr $$
 crop-pool4 = score-pool4[:, :, 5:5+score2.height, 5:5+score2.width]
 ```
 * `Deconvelution`计算：`score-fr`[1,21,16,16] -> `score2` [1,21,34,34] , kernel_size:4, stride:2
-> Conv: $$ out = (in+2*pad-kernel)/stride + 1 $$
-> DeConv: $$ out = (in-1)*stride + kernel -2*pad $$
-> And Now: $$ 34 = (16-1)*2+4-2*0 $$
+> Conv: $out = (in+2*pad-kernel)/stride + 1$
+> DeConv: $out = (in-1)*stride + kernel -2*pad$
+> And Now: $34 = (16-1)*2+4-2*0$
 
 # 2019.01.25 
 - [x] **[FCN学习:Semantic Segmentation]**
@@ -177,7 +178,7 @@ crop-pool4 = score-pool4[:, :, 5:5+score2.height, 5:5+score2.width]
 5. 多.通道卷积计算方式
 ![多通道卷积](https://pic1.zhimg.com/80/v2-8d72777321cbf1336b79d839b6c7f9fc_hd.jpg)
 * 矩阵微分公式:
-$$ \frac {d(Ax+b)}{dx} = {A^T}$$
+$$\frac {d(Ax+b)}{dx} = {A^T}$$
 
 # 2019.01.26
 - [x] **[一文读懂Faster RCNN]**
@@ -374,6 +375,7 @@ https://github.com/matterport/Mask_RCNN [Keras]
 https://github.com/jasjeetIM/Mask-RCNN [Caffe]
 ```
 
+--------------------------------------------------
 # 2019.03.01
 ## Mask R-CNN
 - [x] [Mask R-CNN详解](https://blog.csdn.net/WZZ18191171661/article/details/79453780)
@@ -429,14 +431,14 @@ By dividing it into (2×2) sections (because the output size is 2×2) we get:
 # 2019.03.02
 ## Mask R-CNN
 
-###
+---------------
 - [x] **Mask-RCNN-Arc-How-RoI_Pooling-RoI_Warping_RoI-Align_Work.mp4**
 * ROI Pooling和ROIAlign最大的区别是：前者使用了两次量化操作，而后者并没有采用量化操作，使用了线性插值算法，具体的解释如下所示:
 
 ![ROIPooling](https://img-blog.csdn.net/20180306110240257)
 ![ROIAlign](https://img-blog.csdn.net/20180306110334767)
 
-###
+----------------
 - [x] **2017-Mask R-CNN.pdf**
 * [Mask R-CNN 论文翻译](https://alvinzhu.xyz/2017/10/07/mask-r-cnn/#fn:18)
 * [Mask R-CNN完整翻译](https://blog.csdn.net/myGFZ/article/details/79136610)
@@ -456,7 +458,7 @@ By dividing it into (2×2) sections (because the output size is 2×2) we get:
 * 2016-Segment Proposal.pdf
 * 2015-DeepMask.pdf
 
-###
+--------------------
 - [x] [Mask RCNN笔记](https://blog.csdn.net/xiamentingtao/article/details/78598511)
 * ROI Align 的反向传播
 > 常规的`ROI Pooling`的反向传播公式如下：
@@ -470,6 +472,7 @@ By dividing it into (2×2) sections (because the output size is 2×2) we get:
 
 > 上式中，d(.)表示两点之间的距离，Δh和Δw表示 xi 与 xi*(r,j) 横纵坐标的差值，这里作为双线性内插的系数乘在原始的梯度上。
 
+----------------------------------------------------
 # 2019.03.03
 ## SE-Net
 - [x] **85-ImageNet冠军模型SE-Net详解**
@@ -496,7 +499,7 @@ BN-Inception  	| 2.03
 * ResNet-50 `Conv5层`没必要加`SE`模块
 
 
-
+-----------------------
 ## Conv卷积，边缘检测
 - [x] **吴恩达Conv卷积，边缘检测部分**
 * 第一周 卷积神经网络-1.2/1.3节
@@ -531,7 +534,7 @@ sum(y^i-yi)^2		|	y0 = 1
 * [bx, by, bh, bw] are parameted relative to the grid cell.
 
 
-
+-----------------------
 ## YOLO
 - [x] **跑通YOLO**
 * [YOLO](https://pjreddie.com/darknet/yolo/)
@@ -665,7 +668,7 @@ $$ {bw = pw*e^{tw}}, {bh = ph*e^{th}}  $$
 * Thresholding by Object Confidence.
 * Non-maximum Suppression.
 
-------------------------
+---------------------------------------------
 # 2019.03.05
 ## YOLOv3
 - [x] [How to implement a YOLO (v3) object detector from scratch in PyTorch: Part 2](https://blog.paperspace.com/how-to-implement-a-yolo-v3-object-detector-from-scratch-in-pytorch-part-2/)
@@ -960,7 +963,7 @@ class_loss = K.sum(class_loss) / mf
 ```
 > 除了w, h的损失函数依然采用`总方误差`之外，其他部分的损失函数用的是`二值交叉熵`.
 
-
+-------------------------
 ## YOLOv3
 - [x] [基于keras-yolov3，原理及代码细节的理解](https://blog.csdn.net/KKKSQJ/article/details/83587138)
 ### anchor box:
@@ -989,7 +992,7 @@ class_loss = K.sum(class_loss) / mf
 > (tw,th):预测边框的宽和高, `maybe > 1`
 > PS：最终得到的边框坐标值是bx,by,bw,bh.而网络学习目标是tx,ty,tw,th
 
-
+--------------------
 ## YOLOv3
 - [x] [YOLO从零开始：基于YOLOv3的行人检测入门指南](https://zhuanlan.zhihu.com/p/47196727)
 ### 通过`voc_label.py`转化`voc数据`格式为`yolo支持`的格式.
@@ -1040,6 +1043,7 @@ count:        	# 正样本数目。
 ### 图片上添加置信值
 * 代码比较熟悉的童鞋，使用opencv在画框的函数里面添加一下就行了。
 
+---------------------------
 ## Paper Reading
 - [x] [YOLOv3 全文翻译](https://zhuanlan.zhihu.com/p/34945787)
 
@@ -1127,17 +1131,17 @@ $ ./darknet detector train cfg/voc-person.data cfg/yolov3-voc-person.cfg backup_
  subdivisions=1
 $ ./darknet detector test cfg/voc-person.data cfg/yolov3-voc-person.cfg backup_person/yolov3-voc-person.backup data/person6.jpg
 ```
-
-8. 用脚本`analyse.py`对`训练日志train7-loss.txt`的训练过程可视化。
-
-
+## 训练效果很好！！！
+8. 用脚本`analyse.py`对`训练日志train7-loss.txt`的训练过程可视化(`AlexeyAB/darknet`)。
 
 
+
+------------------------------------------------------
 # 2019.03.06
 ## DANet
 * [github](https://github.com/junfu1115/DANet)
 * [CityScapes detailed-results](https://www.cityscapes-dataset.com/detailed-results/)
-
+-------------------
 - [x] [DANet&CCNet](https://segmentfault.com/a/1190000018271713)
 * 两篇文章都是将self-attention机制应用到分割当中，扩大感受野。第二篇文章采用了更巧妙的方法来减少参数。
 * `self-attention`在分割中应用的大致思想是：`特征图`与`特征图的转置`进行矩阵相乘，由于特征图有`channel维度`，相当于是每个像素与另外每个元素都进行`点乘操作`，而向量的点乘几何意义为计算`两个向量的相似度`，两个向量越相似，它们点乘越大。看下图，特征图转置与特征图矩阵相乘后用softmax进行归一化就得到了`Attention map S`。S再与特征图的转置进行矩阵相乘，这个操作`把相关性信息重新分布到原始特征图上`，最后再将这个信息与特征图A相加，得到最终输出，这个输出结合了`整张图的相关性结果`。
@@ -1149,7 +1153,7 @@ $ ./darknet detector test cfg/voc-person.data cfg/yolov3-voc-person.cfg backup_p
 ![](https://c2.staticflickr.com/8/7896/40180410623_4f9679fd0e_c.jpg)
 
 > 除了上面说的那一部分attention，作者还加了`蓝色channel attention`，在这里计算特征图与特征图转置矩阵相乘操作时，相乘的顺序调换了一下，这相当于是让channel与channel之间进行点乘操作，计算channel之间的相似性，在这里我认为每张channel map代表了不同类别，这样让类别与类别计算距离，来进行辅助。
-
+----------------------
 ## DANet
 - [x] [几篇较新的计算机视觉Self-Attention](https://zhuanlan.zhihu.com/p/44031466?utm_source=wechat_session&utm_medium=social&utm_oi=963402370776072192&from=timeline&isappinstalled=0)
 * 总的来说，就是区域权值学习问题：
@@ -1194,7 +1198,7 @@ $ ./darknet detector test cfg/voc-person.data cfg/yolov3-voc-person.cfg backup_p
 * 把deep feature map进行`spatial-wise self-attention`，同时也进行`channel-wise self-attetnion`，最后将两个结果进行`element-wise sum`融合。
 * 好处是：借鉴CBAM`分别进行空间和通道`self-attention的思想上，直接使用了 non-local 的自相关矩阵Matmul的形式进行运算，避免了CBAM手工设计pooling，多层感知器等复杂操作。
 
-
+----------------------
 ## DANet
 - [x] [DANet PPT](https://blog.csdn.net/mieleizhi0522/article/details/83111183) 
 * SOTA(State of the art).
@@ -1246,10 +1250,137 @@ $ ./darknet detector test cfg/voc-person.data cfg/yolov3-voc-person.cfg backup_p
 ![](https://img-blog.csdn.net/20181017154717952?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21pZWxlaXpoaTA1MjI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
 
-# ==TODO==
-
+------------------------------------------------------
 # 2019.03.07
-- [ ] **DeepLab V3+论文代码**
+## **DeepLab V3+论文代码**
+- [x] **deeplab_v2.docx**
+- [x] **deeplab_v3.docx**
+-------------------------
+- [x] **deeplab_v3+.docx**
+### DeepLabv3+ 网络结构
+
+![](https://github.com/kinglintianxia/note_book/blob/master/imgs/deeplab_v3+.png)
+
+### DeepLabv3+使用Modified Aligned Xception，对Xception的改进如下:
+* 层数变深了.
+* 所有的`最大池化`都被`替换`成了`3x3 with stride 2` 的 Separable `Convolution`.
+* 在每个 3x3 Depthwise Separable Convolution 的后面加了 BN 和 ReLU.
+* 最终测试结果`Xception+decoder`的结构性能最优.
+
+---------------------------
+## DeepLabv3+
+- [x] [deeplabv3+Xception](https://blog.csdn.net/u013711082/article/details/80415376)
+## 1. Xception
+### Inception的理念:
+* 首先通过一系列的 1x1 卷积来学习`cross-channel correlations`，同时将输入的维度降下来；再通过常规的 3x3 和 5x5 卷积来学习`spatial correlations`。这样一来，两个卷积模块分工明确。Inception V3 中的 module 如下图:
+
+![](https://ss.csdn.net/p?https://mmbiz.qpic.cn/mmbiz_jpg/VBcD02jFhgkMEHDUCLNw7T4Zq62RbCDLkgC65vBFz3wF7icagyJ4wNQEibUlGEgy25R9Yy7MFHBvuTG8JfFw4qRg/640)
+
+### Inception的假设:
+* `corss-channels correlations` 和 `spatial correlations` 是`分开学习`的，而不是在某一个操作中共同学习的。
+
+### Inception到Xception(Extreme Inception) 的转变
+1. 简版的Inception module:拿掉所有的pooling，并且只用一层3x3的卷积来提取spatial correlations，如Figure2。
+
+![](https://ss.csdn.net/p?https://mmbiz.qpic.cn/mmbiz_jpg/VBcD02jFhgkMEHDUCLNw7T4Zq62RbCDL3NkJrcj022o3ErWyuCzFEXwz4Sr8LK9o6eVqBGZyibxaMXgNokCOe5A/640)
+
+2. 简版Inception:可以将这些1x1的卷积用一个较大的 1x1 卷积来替代（也就是在`channel上进行triple`），再在这个较大卷积产生的feature map上分出三个不重叠的部分，进行`separable convolution`，如 Figure3。 
+
+![](https://ss.csdn.net/p?https://mmbiz.qpic.cn/mmbiz_jpg/VBcD02jFhgkMEHDUCLNw7T4Zq62RbCDLlgdsZ7yf5gzpVmNCS4djd1ia9NgRROSmCb30faXSo8tUaCJulOokfwQ/640)
+
+> 这样一来就自然而然地引出：为什么不是`分出多个`不重叠的部分，而是`分出三个`部分来进行 separable convolution 呢？如果加强一下 Inception 的假设，假设 cross-channel correlations 和 spatial correlations 是完全无关的呢？
+
+> 沿着上面的思路，一种`极端的情况`就是，在`每个channel`上进行 separable convolution，假设 1x1 卷积输出的 `feature map的channel有128个`，那么极端版本的Inception 就是在`每个channel`上进行3x3的卷积，而不是学习一个 3x3x128的kernel，取而代之的是`学习128个3x3的kernel`。 
+
+![](https://ss.csdn.net/p?https://mmbiz.qpic.cn/mmbiz_jpg/VBcD02jFhgkMEHDUCLNw7T4Zq62RbCDL9u5jywUz4ntjEbMn8CnzAN9yJfjUHmgNTsb92Y1U5Pokz3CXWqxKmA/640)
+
+3. Xception Architecture:一种`Xception module` 的线性堆叠，并且使用了`residual connection`(`残差单元`的输出由多个卷积层级联的输出和输入元素间相加)，数据依次流过`Entry flow`，`Middle flow` 和 `Exit flow`。
+
+![](https://github.com/kinglintianxia/note_book/blob/master/imgs/Xception.png)
+
+### 顺便写一点读 Xception 时的小发现
+* Xception 的实验有一部分是关于应不应该在`1x1卷积后面只用激活层的讨论`，实验结果是：如果在1x1卷积后`不加以激活`直接进行depthwise separable convolution，无论是在收敛速度还是效果上都`优于`在1x1 卷积后加以 ReLU 之类激活函数的做法。
+> 这可能是因为，在对很浅的 feature（比如这里的 1-channel feature）进行激活会导致一定的信息损失，而对很深的 feature，比如 Inception module 提取出来的特征，进行激活是有益于特征的学习的，个人理解是这一部分特征中有大量冗余信息。
+
+## 2. DeepLab V3+
+* 论文里，作者直言不讳该框架参考了`spatial pyramid pooling (SPP) module`和`encoder-decoder` 两种形式的分割框架。前一种就是`PSPNet`那一款，后一种更像是`SegNet`的做法.
+* `ASPP(Atrous Spatial Pyramid Pooling)`方法的优点是该种结构可以提取比较 dense 的特征，因为参考了不同尺度的 feature，并且 atrous convolution 的使用加强了提取 dense 特征的能力。但是在该种方法中由于 pooling 和有 stride 的 conv 的存在，使得分割目标的边界信息丢失严重.
+* Encoder-Decoder 方法的 decoder 中就可以起到修复尖锐物体边界的作用。
+
+### 关于Encoder中卷积的改进
+* DeepLab V3+ 效仿了Xception中使用的`depthwise separable convolution`，在 DeepLab V3 的结构中使用了`atrous depthwise separable convolution`，降低了计算量的同时保持了相同（或更好）的效果。
+
+### **Decoder的设计**
+1. Encoder 提取出的特征首先被 x4 上采样，称之为 F1；
+2. Encoder 中提取出来的与 F1 同尺度的特征 F2’ 先进行 1x1 卷积，降低通道数得到 F2，再进行 F1 和 F2 的 concatenation，得到 F3；
+> 为什么要进行通道降维？因为在 encoder 中这些尺度的特征通常通道数有 256 或者 512 个，而 encoder 最后提取出来的特征通道数没有这么多，如果不进行降维就进行 concate 的话，无形之中加大了 F2’ 的权重，加大了网络的训练难度。
+3. 对 F3 进行常规的 3x3 convolution 微调特征，最后直接 x4 upsample 得到分割结果。
+
+![](https://github.com/kinglintianxia/note_book/blob/master/imgs/deeplab_v3+_1.png)
+
+
+### DeepLabv3+使用Modified Aligned Xception(BackBone),对Xception的改进如下:
+
+![](https://github.com/kinglintianxia/note_book/blob/master/imgs/Modified Aligned Xception.png)
+
+* 层数变深了.
+* 所有的`最大池化`都被`替换`成了`3x3 with stride 2` 的 Separable `Convolution`.
+* 在每个 3x3 Depthwise Separable Convolution 的后面加了 BN 和 ReLU.
+* 最终测试结果`Xception+decoder`的结构`性能最优`.
+
+
+-------------------------
+## DeepLabv3+
+- [ ] [PSPNet VS DeepLabv3](https://zhuanlan.zhihu.com/p/51132008)
+### 网络结构
+1. PSPNet:
+
+![](https://github.com/kinglintianxia/note_book/blob/master/imgs/PSPNet.png)
+
+2. DeepLabv3:
+
+![](https://github.com/kinglintianxia/note_book/blob/master/imgs/DeepLabv3.png)
+
+### 基础网络(Backbone)
+1. PSPNet:
+带`dilation卷积`的`ResNet系列`：ResNet50，ResNet101，ResNet152，ResNet269，以ResNet50为例，后面两个Block是dilation=2和4的。
+
+2. DeepLabv3:
+带有Multi-Grid（Multi-Grid=（1,2,4）最优）的dilation的ResNet系列。
+
+### Loss
+PSPNet:在Block4后面有一个辅助的分类Loss,而DeepLabv3：就一个最后的Loss
+
+### 输出
+PSPNet和DeepLabv3原论文中应该是**将label下采样到8倍后与输出进行比较**。
+
+### 数据增强
+1. PSPNet
+> we adopt `random mirror` and `random resize` between 0.5 and 2 for all datasets, and additionally add `random rotation` between -10 and 10 degrees, and `random Gaussian blur` for ImageNet and PASCAL VOC.
+
+2. DeepLabv3
+> We apply data augmentation by `randomly scaling` the input images (from 0.5 to 2.0) and `randomly left-right flipping` during training.
+
+### 训练策略
+1. PSPNet
+poly,初始学习率乘以$(1-\frac{iter}{maxiter})^{power}$, where power=0.9,Lr=0.01.
+2. DeepLabv3
+poly,初始学习率乘以$(1-\frac{iter}{maxiter})^{power}$, where power=0.9,The batch.
+
+
+
+- [ ] [语义分割：DeepLabV3+翻译](https://zhuanlan.zhihu.com/p/41150415)
+
+- [ ] [TensorFlow DeepLabV3+训练自己的数据分割](https://zhuanlan.zhihu.com/p/42756363)
+- [ ] [在tensorflow上用其他数据集训练DeepLabV3+](https://www.jianshu.com/p/dcca31142b99)
+- [ ] [火焰识别--重新标注后的Deeplabv3+训练](https://blog.csdn.net/w_xiaowen/article/details/85289750)
+- [ ] [使用 deeplabv3+ 训练自己的数据集经验总结](https://blog.csdn.net/Kelvin_XX/article/details/81946091)
+- [ ] [图像语义分割 DeepLab v3+ 训练自己的数据集](https://blog.csdn.net/qq_32799915/article/details/80070711)
+- [ ] [Deeplab V3+训练自己数据集全过程](https://blog.csdn.net/jairana/article/details/83900226)
+
+
+- [ ] [deeplabV3+源码分解学习](https://www.jianshu.com/p/d0cc35b3f100)
+- [ ] [Deeplab V3+ 源码解读及tf.estimator实践](https://blog.csdn.net/wangdongwei0/article/details/82959670)
 
 
 
@@ -1257,6 +1388,9 @@ $ ./darknet detector test cfg/voc-person.data cfg/yolov3-voc-person.cfg backup_p
 
 
 
+
+
+# ==TODO==
 
 - [ ] [UNIX Tutorial for Beginners](http://www.ee.surrey.ac.uk/Teaching/Unix/)
 - [ ] [完全解析RNN, Seq2Seq, Attention注意力机制](https://zhuanlan.zhihu.com/p/51383402)
