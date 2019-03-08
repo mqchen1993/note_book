@@ -159,9 +159,9 @@ $$ AP = \int_0^1 {p(r)} dr $$
 crop-pool4 = score-pool4[:, :, 5:5+score2.height, 5:5+score2.width]
 ```
 * `Deconvelution`计算：`score-fr`[1,21,16,16] -> `score2` [1,21,34,34] , kernel_size:4, stride:2
-> Conv: $out = (in+2*pad-kernel)/stride + 1$
-> DeConv: $out = (in-1)*stride + kernel -2*pad$
-> And Now: $34 = (16-1)*2+4-2*0$
+Conv: $out = (in+2*pad-kernel)/stride + 1$
+DeConv: $out = (in-1)*stride + kernel -2*pad$
+And Now: $34 = (16-1)*2+4-2*0$
 
 # 2019.01.25 
 - [x] **[FCN学习:Semantic Segmentation]**
@@ -940,7 +940,9 @@ layer     filters    size              input                output
 > `concat`：张量拼接。将darknet中间层和后面的某一层的上采样进行拼接。拼接的操作和残差层add的操作是不一样的，拼接会扩充张量的维度，而add只是直接相加不会导致张量维度的改变。
 > COCO dataset:[tx,ty,tw,th,Objectness Score(, Class Confidences(80)]*3 = [4,1,80]*3 = 85*3 = 255.
 
-* [模型结构可视化(vis)工具](https://github.com/lutzroeder/Netron)
+* [**模型结构可视化(vis)工具**](https://github.com/lutzroeder/Netron)
+* [Netron browser version](https://lutzroeder.github.io/netron/)
+
 * 轻量化网络: SqueezeNet.
 * v3毫无疑问现在成为了工程界首选的检测算法之一了，结构清晰，实时性好。
 * `疑问`:输出y1,y2,y3的预测是叠加一起成为最后的输出的吗?
@@ -1331,7 +1333,7 @@ $ ./darknet detector test cfg/voc-person.data cfg/yolov3-voc-person.cfg backup_p
 
 -------------------------
 ## DeepLabv3+
-- [ ] [PSPNet VS DeepLabv3](https://zhuanlan.zhihu.com/p/51132008)
+- [x] [PSPNet VS DeepLabv3](https://zhuanlan.zhihu.com/p/51132008)
 ### 网络结构
 1. PSPNet:
 
@@ -1368,19 +1370,290 @@ poly,初始学习率乘以$(1-\frac{iter}{maxiter})^{power}$, where power=0.9,Lr
 poly,初始学习率乘以$(1-\frac{iter}{maxiter})^{power}$, where power=0.9,The batch.
 
 
+-------------------------
+## DeepLabv3+ 
+- [x] **Paper Reading**
+* [语义分割：DeepLabV3+翻译](https://zhuanlan.zhihu.com/p/41150415)
 
-- [ ] [语义分割：DeepLabV3+翻译](https://zhuanlan.zhihu.com/p/41150415)
+![](https://github.com/kinglintianxia/note_book/blob/master/imgs/SPP&Encoder-Decoder&E-D_Atrous_Conv.png)
 
-- [ ] [TensorFlow DeepLabV3+训练自己的数据分割](https://zhuanlan.zhihu.com/p/42756363)
-- [ ] [在tensorflow上用其他数据集训练DeepLabV3+](https://www.jianshu.com/p/dcca31142b99)
-- [ ] [火焰识别--重新标注后的Deeplabv3+训练](https://blog.csdn.net/w_xiaowen/article/details/85289750)
-- [ ] [使用 deeplabv3+ 训练自己的数据集经验总结](https://blog.csdn.net/Kelvin_XX/article/details/81946091)
-- [ ] [图像语义分割 DeepLab v3+ 训练自己的数据集](https://blog.csdn.net/qq_32799915/article/details/80070711)
-- [ ] [Deeplab V3+训练自己数据集全过程](https://blog.csdn.net/jairana/article/details/83900226)
+### Tensorflow `models/research`:
+1. deeplab
+2. inception
+3. resnet
+4. models/samples/core/tutorials/keras
+5. models/samples/core/tutorials/estimators
+6. models/tutorials/image
+
+
+--------------------------------------------
+# 2019.03.08
+## DeepLabv3+ Train&Test
+- [x] [TensorFlow DeepLabV3+训练自己的数据分割](https://zhuanlan.zhihu.com/p/42756363)
+
+当然出来cityspcapes数据集之外你也可以放许多其他的数据集。包括我自己的车道线数据集，分割效果也还不错，连左右车道线都能分割出来。
+
+### 数据集制作
+* 假设你用`labelme`或者其他工具标注了你的数据，你的保存标注可能是polygon的点，也可能是mask。这里我`推荐保存polygon`，因为deeplab中使用的`label`是单通道以你的`类别的id为像素值`的标签.
+
+* 关于label有几点需要注意的，`像素值就是label的index`，从我的map也能看的出来.除此之外没了。另外，如果你的类别里面没有`ignore_label`, 那就直接是idx和0,0就是背景。`如果有ignore_label就是255`,相应的类别写进去，颜色值为255就是ignore了。
+
+* 接下来你的生成相应的`tfrecords`
+
+
+
+
+--------------------------
+## DeepLabv3+ Train&Test
+- [x] [在tensorflow上用其他数据集训练DeepLabV3+](https://www.jianshu.com/p/dcca31142b99)
+1. clone 谷歌官方源码到本地
+2. 添加Python环境变量
+$ export PYTHONPATH=$PYTHONPATH:/home/xxx/Downloads/models-master/research/slim
+3. 测试一下
+```shell
+#在deeplab/research目录下运行
+python deeplab/model_test.py
+```
+4. 生成图像mask。
+5. 生成voctrain.txt vocval.txt为接下来生成tfrecord做准备。
+6. 生成tfrecord
+
+
+
+--------------------------
+## DeepLabv3+ Train&Test
+- [x] [火焰识别--重新标注后的Deeplabv3+训练](https://blog.csdn.net/w_xiaowen/article/details/85289750)
+* 将使用`labelme生成的json文件`转换成标注后的图片
+
+
+--------------------------
+## DeepLabv3+ Train&Test
+- [x] [使用deeplabv3+训练自己的数据集经验总结](https://blog.csdn.net/Kelvin_XX/article/details/81946091)
+* 为了能在`windows系统上运行shell脚本`，这里强烈推荐`[Git Bash](https://www.git-scm.com/download/)`。它是Git（没错，就是那个代码管理系统）软件的一个子程序，感觉比windows自带的cmd和powershell要好用！ 
+* 然后`正常安装`，完毕后在任何文件夹的`空白处鼠标右键`，点击`Git Bash Here`选项，就可以在当前右键的路径下打开一个 Git Bash 控制台，长这个样子:
+
+![](https://img-blog.csdn.net/20180822195005838?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0tlbHZpbl9YWA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70) 
+
+* VOC数据集的目录组织形式应当这样:
+```python
++ Database # 自己的数据集名称 
+	+ JPEGImages 
+	+ SegmentationClass 
+	+ ImageSets 
+		+ Segmentation 
+			- train.txt
+			- val.txt
+			- trainval.txt
++ tfrecord
+```
+其中：
+1. `JPGImages` 文件夹存放RGB图像；
+2. `SegmentationClass` 存放转换为class的标签，格式为单通道的png图像。对应的图像和标签的文件名相同！！扩展名分别为.jpg和.png
+3. `ImageSets/Segmentation` 存放有图像文件名的 .txt 文件，这里我按文件名将数据分为 train, val, trainval； 
+4. `tfrecord` 存放转换的 tfrecord 格式的数据。
+5. `.txt` 文件中的内容应当为对应图像的文件名，不带扩展名：
+
+* 转换为TFRecord 格式
+可在代码中调节参数 `_NUM_SHARDS` （默认为4），改变`数据分块的数目`。（一些文件系统有最大单个文件大小的限制，如果数据集非常大，增加 _NUM_SHARDS 可减小单个文件的大小）
+
+* **注册数据集**
+
+
+--------------------------
+## DeepLabv3+ Train&Test
+- [x] [Deeplab V3+训练自己数据集全过程](https://blog.csdn.net/jairana/article/details/83900226)
+* [labelme制作数据集](https://note.youdao.com/ynoteshare1/index.html?id=032620eac64634508cd4f9e65be4617c&type=note#/)
+
+
+-------------------------
+### Run DeepLabv3+
+1. Install libraries
+```shell
+$ sudo apt-get install python-pil python-numpy
+$ pip install --user jupyter
+$ pip install --user matplotlib
+$ pip install --user PrettyTable
+```
+2. Add Libraries to `PYTHONPATH`
+```shell
+# add this line to '~/.bashrc'
+export PYTHONPATH=$PYTHONPATH:/home/jun/Documents/king/models/research:/home/jun/Documents/king/models/research/slim
+```
+3. Testing the Installation
+```shell
+# From tensorflow/models/research/deeplab
+$ python model_test.py
+# ---- It will print ----
+Ran 5 tests in 16.648s
+
+OK
+```
+-----------
+4. VOC dataset
+### Recommended Directory Structure for Training and Evaluation:
+```shell
++ datasets
+  + pascal_voc_seg
+    + tfrecord						# convert from voc2012
+    + exp	
+      + train_on_train_set			# train_on_train_set stores the train/eval/vis events and results
+        + train
+        + eval
+        + vis
+```
+
+### 4.1 Uncompress VOC2012 dataset.
+```shell
+$ cd /media/jun/ubuntu/datasets/VOC
+# -x, extract files from an archive; -f, use archive file or device ARCHIVE;
+# -v, verbosely list files processed
+# -C, change to directory DIR
+$ tar -xvf VOCtrainval_11-May-2012.tar -C ../
+# cd to deeplab
+$ cd /home/jun/Documents/king/models/research/deeplab/datasets
+# Removes the color map from the ground truth segmentation annotations and save the results to output_dir.
+$ python remove_gt_colormap.py --original_gt_folder=/media/jun/ubuntu/datasets/VOCdevkit/VOC2012/SegmentationClass/ --output_dir=/media/jun/ubuntu/datasets/VOCdevkit/VOC2012/SegmentationClassRaw
+# mkdir 
+$ mkdir pascal_voc_seg/tfrecord
+# convert
+$ python build_voc2012_data.py --image_folder=/media/jun/ubuntu/datasets/VOCdevkit/VOC2012/JPEGImages/ --semantic_segmentation_folder=/media/jun/ubuntu/datasets/VOCdevkit/VOC2012/SegmentationClassRaw/ --list_folder=/media/jun/ubuntu/datasets/VOCdevkit/VOC2012/ImageSets/Segmentation/ --image_format=jpg --output_dir=./pascal_voc_seg/tfrecord
+## 各参数意义如下：
+    `image_folder`： 保存images的路径
+    `semantic_segmentation_folder`： 保存labels的路径
+    `list_folder`： 保存train\val.txt文件的路径
+    `image_format`： image的格式
+    `output_dir`： 生成tfrecord格式的数据所要保存的位置
+
+## Terminal print
+>> Converting image 363/1449 shard 0
+>> Converting image 726/1449 shard 1
+>> Converting image 1089/1449 shard 2
+>> Converting image 1449/1449 shard 3
+```
+------------------
+### 4.2 A local `evaluation` job using `xception_65` can be run with the following command:
+```shell
+$ cd /home/jun/Documents/king/models/research/deeplab
+# Download checkpoint from https://github.com/tensorflow/models/blob/master/research/deeplab/g3doc/model_zoo.md
+$ mkdir pascal_voc_seg/model_zoo && cd pascal_voc_seg/model_zoo
+$ wget http://download.tensorflow.org/models/deeplabv3_pascal_trainval_2018_01_04.tar.gz
+
+# tar it & touch `checkpoint` file:
+model_checkpoint_path: "./model.ckpt"
+all_model_checkpoint_paths: "./model.ckpt"
+
+# run eval, From tensorflow/models/research/deeplab
+$ python eval.py --logtostderr --eval_split="val" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --eval_crop_size=513 --eval_crop_size=513 --dataset="pascal_voc_seg" --checkpoint_dir=./datasets/model_zoo/deeplabv3_pascal_trainval --eval_logdir=./datasets/pascal_voc_seg/exp/train_on_train_set/eval --dataset_dir=./datasets/pascal_voc_seg/tfrecord
+
+## Terminal print
+INFO:tensorflow:Finished evaluation at 2019-03-08-07:49:00
+miou_1.0[0.935834229]
+## Get output file: 'datasets/pascal_voc_seg/exp/train_on_train_set/eval/events.out.tfevents.1552031267.jun-pc'
+$ tensorboard --logdir ./
+```
+---------------------
+### 4.3 A local `visualization` job using `xception_65` can be run with the following command:
+```shell
+# run vis, From tensorflow/models/research/deeplab
+$ python vis.py --logtostderr --vis_split="val" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --vis_crop_size=513 --vis_crop_size=513 --dataset="pascal_voc_seg" --checkpoint_dir=./datasets/model_zoo/deeplabv3_pascal_trainval --vis_logdir=./datasets/pascal_voc_seg/exp/train_on_train_set/vis --dataset_dir=./datasets/pascal_voc_seg/tfrecord
+
+## Get output file: 'datasets/pascal_voc_seg/exp/train_on_train_set/vis/segmentation_results'
+```
+
+---------------------
+### 4.4 A local `training` job using `xception_65` can be run with the following command::
+```shell
+# run training, From tensorflow/models/research/deeplab
+$ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=513 --train_crop_size=513 --train_batch_size=1 --dataset="pascal_voc_seg" --tf_initial_checkpoint=./datasets/model_zoo/xception_65_coco_pretrained/x65-b2u1s2p-d48-2-3x256-sc-cr300k_init.ckpt.index --train_logdir=./datasets/pascal_voc_seg/exp/train_on_train_set/train --dataset_dir=./datasets/pascal_voc_seg/tfrecord
+
+## Get output file: 'datasets/pascal_voc_seg/exp/train_on_train_set/train'
+```
+
+
+-----------
+5. CityScapes dataset
+### Recommended Directory Structure for Training and Evaluation:
+```shell
++ datasets
+  + cityscapes
+    + tfrecord
+    + exp
+      + train_on_train_set
+        + train
+        + eval
+        + vis
+```
+
+### 5.1 Prepare dataset and convert to TFRecord
+```shell
+# From tensorflow/models/research/deeplab/datasets
+$ ./convert_cityscapes_me.sh
+# This shell script run 'cityscapesscripts/preparation/createTrainIdLabelImgs.py'
+# And then run 'build_cityscapes_data.py'
+```
+
+------------------
+### 5.2 A local `evaluation` job using `xception_65` can be run with the following command:
+```shell
+$ cd deeplab/datasets/model_zoo
+# Download checkpoint from https://github.com/tensorflow/models/blob/master/research/deeplab/g3doc/model_zoo.md
+$ wget http://download.tensorflow.org/models/deeplabv3_cityscapes_train_2018_02_06.tar.gz
+
+# tar it & touch `checkpoint` file:
+model_checkpoint_path: "./model.ckpt"
+all_model_checkpoint_paths: "./model.ckpt"
+
+# run eval, From tensorflow/models/research/deeplab
+$ python eval.py --logtostderr --eval_split="val" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --eval_crop_size=513 --eval_crop_size=513 --dataset="cityscapes" --checkpoint_dir=./datasets/model_zoo/deeplabv3_cityscapes_train/checkpoint --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord
+## Get 'Waiting for new checkpoint at...' 
+## Terminal print
+INFO:tensorflow:Finished evaluation at 2019-03-08-07:49:00
+miou_1.0[0.935834229]
+## Get output file: 'datasets/cityscapes/exp/train_on_train_set/eval/events.out.tfevents.1552031267.jun-pc'
+$ tensorboard --logdir ./
+```
+
+---------------------
+### 5.3 A local `visualization` job using `xception_65` can be run with the following command:
+```shell
+# run vis, From tensorflow/models/research/deeplab
+$ python vis.py --logtostderr --vis_split="val" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --vis_crop_size=1025 --vis_crop_size=2049 --dataset="cityscapes" --colormap_type="cityscapes" --checkpoint_dir=./datasets/model_zoo/deeplabv3_cityscapes_train --vis_logdir=./datasets/cityscapes/exp/train_on_train_set/vis --dataset_dir=./datasets/cityscapes/tfrecord
+
+## Get output file: 'datasets/cityscapes/exp/train_on_train_set/vis/segmentation_results'
+```
+
+---------------------
+### 5.4 A local `training` job using `xception_65` can be run with the following command::
+```shell
+# run training, From tensorflow/models/research/deeplab
+$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=2 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/xception_65_coco_pretrained/x65-b2u1s2p-d48-2-3x256-sc-cr300k_init.ckpt.index --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord
+
+# Multi GPUs Training
+$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=2 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/xception_65_coco_pretrained/x65-b2u1s2p-d48-2-3x256-sc-cr300k_init.ckpt.index --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2
+
+## Get output file: 'datasets/cityscapes/exp/train_on_train_set/train'
+```
+
+
+
+--------------------------
+## DeepLabv3+ Code Reading
+
+- [x] **deeplab_demo.ipynb**
+* 修改不用每次下载模型，从'ubuntu'盘读取模型。
+
+
+
+- [ ] [Deeplab V3+ 源码解读及tf.estimator实践](https://blog.csdn.net/wangdongwei0/article/details/82959670)
 
 
 - [ ] [deeplabV3+源码分解学习](https://www.jianshu.com/p/d0cc35b3f100)
-- [ ] [Deeplab V3+ 源码解读及tf.estimator实践](https://blog.csdn.net/wangdongwei0/article/details/82959670)
+github上deeplabV3+的源码是基于tensorflow（slim）简化的代码，是一款非常值得学习的标准框架结构
+
+
+
+
+
 
 
 
