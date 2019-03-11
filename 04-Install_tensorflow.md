@@ -73,10 +73,10 @@ $ sudo apt-get install python-pip python-dev   # for Python 2.7
 $ sudo apt-get install python3-pip python3-dev # for Python 3.n
 $ pip install --upgrade pip
 ```
-* **Problem**:
+### **Problem**:
 * pip error ocured!
 > Import Error:cannot import name main
-**Solution**
+### **Solution**
 ```shell
 $ sudo vim /usr/bin/pip
 ```
@@ -92,15 +92,32 @@ from pip import __main__
 if __name__ == '__main__':
     sys.exit(__main__._main())
 ```
-* Install `tensorflow-gpu`
+### Install `tensorflow-gpu`
 ```shell
 $ pip install --upgrade --user tensorflow-gpu   # Python 2.7
+# Assigned version
+$ pip install --upgrade --user tensorflow-gpu==1.12.0	# Python 2.7
+
 $ pip3 install --upgrade --user tensorflow-gpu  # Python 3.n
+
+# Uninstall
+$ 
 ```
-* Test install 
+### Test install 
 ```shell
 $ python -c "import tensorflow as tf; print(tf.__version__)"
 ```
 And it will print `1.10.1`.
 * **Done!**
 
+* Errors:
+```python
+from tensorflow.python.estimator import estimator
+ImportError: cannot import name estimator
+```
+Solution:
+```shell
+$ pip install -U pandas (0.23.4 installed)
+$ pip install -U matplotlib (3.0.2 installed)
+
+```

@@ -1406,6 +1406,7 @@ poly,初始学习率乘以$(1-\frac{iter}{maxiter})^{power}$, where power=0.9,Th
 --------------------------
 ## DeepLabv3+ Train&Test
 - [x] [在tensorflow上用其他数据集训练DeepLabV3+](https://www.jianshu.com/p/dcca31142b99)
+### CAMVID数据集
 1. clone 谷歌官方源码到本地
 2. 添加Python环境变量
 $ export PYTHONPATH=$PYTHONPATH:/home/xxx/Downloads/models-master/research/slim
@@ -1418,7 +1419,22 @@ python deeplab/model_test.py
 5. 生成voctrain.txt vocval.txt为接下来生成tfrecord做准备。
 6. 生成tfrecord
 
+> When `fine_tune_batch_norm=True`, use at least batch size larger than 12 (batch size more than 16 is better). Otherwise, one could use smaller batch size and set fine_tune_batch_norm=False.
 
+> --eval_crop_size=2710 这里=后不能有空格，--eval_crop_size= 2710 不然报错 所有的=后面都不能有空格 不然报错。
+
+> if you want to `fine-tune` DeepLab on your own dataset, then you can modify some parameters in train.py, here has some options:
+
+    you want to `re-use all the trained wieghts`, set `initialize_last_layer=True`
+    you want to `re-use only the network backbone`, set `initialize_last_layer=False` and `last_layers_contain_logits_only=False`
+    you want to `re-use all the trained weights except the logits`(since the num_classes may be different), set `initialize_last_layer=False` and `last_layers_contain_logits_only=True`
+
+Finally, my setting is as follows:
+
+    `initialize_last_layer=False`
+    `last_layers_contain_logits_only=True`
+
+```
 
 --------------------------
 ## DeepLabv3+ Train&Test
@@ -1543,7 +1559,7 @@ model_checkpoint_path: "./model.ckpt"
 all_model_checkpoint_paths: "./model.ckpt"
 
 # run eval, From tensorflow/models/research/deeplab
-$ python eval.py --logtostderr --eval_split="val" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --eval_crop_size=513 --eval_crop_size=513 --dataset="pascal_voc_seg" --checkpoint_dir=./datasets/model_zoo/deeplabv3_pascal_trainval --eval_logdir=./datasets/pascal_voc_seg/exp/train_on_train_set/eval --dataset_dir=./datasets/pascal_voc_seg/tfrecord
+$ python eval.py --logtostderr --eval_split="val" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --eval_crop_size=513 --eval_crop_size=513 --dataset="pascal_voc_seg" --checkpoint_dir=./datasets/model_zoo/deeplabv3_pascal_trainval --eval_logdir=./datasets/pascal_voc_seg/exp/train_on_train_set/eval --dataset_dir=./datasets/pascal_voc_seg/tfrecord --max_number_of_iterations=1
 
 ## Terminal print
 INFO:tensorflow:Finished evaluation at 2019-03-08-07:49:00
@@ -1555,7 +1571,7 @@ $ tensorboard --logdir ./
 ### 4.3 A local `visualization` job using `xception_65` can be run with the following command:
 ```shell
 # run vis, From tensorflow/models/research/deeplab
-$ python vis.py --logtostderr --vis_split="val" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --vis_crop_size=513 --vis_crop_size=513 --dataset="pascal_voc_seg" --checkpoint_dir=./datasets/model_zoo/deeplabv3_pascal_trainval --vis_logdir=./datasets/pascal_voc_seg/exp/train_on_train_set/vis --dataset_dir=./datasets/pascal_voc_seg/tfrecord
+$ python vis.py --logtostderr --vis_split="val" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --vis_crop_size=513 --vis_crop_size=513 --dataset="pascal_voc_seg" --checkpoint_dir=./datasets/model_zoo/deeplabv3_pascal_trainval --vis_logdir=./datasets/pascal_voc_seg/exp/train_on_train_set/vis --dataset_dir=./datasets/pascal_voc_seg/tfrecord --max_number_of_iterations=1
 
 ## Get output file: 'datasets/pascal_voc_seg/exp/train_on_train_set/vis/segmentation_results'
 ```
@@ -1564,7 +1580,7 @@ $ python vis.py --logtostderr --vis_split="val" --model_variant="xception_65" --
 ### 4.4 A local `training` job using `xception_65` can be run with the following command::
 ```shell
 # run training, From tensorflow/models/research/deeplab
-$ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=513 --train_crop_size=513 --train_batch_size=1 --dataset="pascal_voc_seg" --tf_initial_checkpoint=./datasets/model_zoo/xception_65_coco_pretrained/x65-b2u1s2p-d48-2-3x256-sc-cr300k_init.ckpt.index --train_logdir=./datasets/pascal_voc_seg/exp/train_on_train_set/train --dataset_dir=./datasets/pascal_voc_seg/tfrecord
+$ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=513 --train_crop_size=513 --train_batch_size=8 --dataset="pascal_voc_seg" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_pascal_trainval/model.ckpt --train_logdir=./datasets/pascal_voc_seg/exp/train_on_train_set/train --dataset_dir=./datasets/pascal_voc_seg/tfrecord --num_clones=2 --fine_tune_batch_norm=False --initialize_last_layer=False --last_layers_contain_logits_only=True
 
 ## Get output file: 'datasets/pascal_voc_seg/exp/train_on_train_set/train'
 ```
@@ -1604,21 +1620,27 @@ model_checkpoint_path: "./model.ckpt"
 all_model_checkpoint_paths: "./model.ckpt"
 
 # run eval, From tensorflow/models/research/deeplab
-$ python eval.py --logtostderr --eval_split="val" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --eval_crop_size=513 --eval_crop_size=513 --dataset="cityscapes" --checkpoint_dir=./datasets/model_zoo/deeplabv3_cityscapes_train/checkpoint --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord
+$ python eval.py --logtostderr --eval_split="val" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --eval_crop_size=1025 --eval_crop_size=2049 --dataset="cityscapes" --checkpoint_dir=./datasets/model_zoo/deeplabv3_cityscapes_train --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1
 ## Get 'Waiting for new checkpoint at...' 
 ## Terminal print
 INFO:tensorflow:Finished evaluation at 2019-03-08-07:49:00
 miou_1.0[0.935834229]
 ## Get output file: 'datasets/cityscapes/exp/train_on_train_set/eval/events.out.tfevents.1552031267.jun-pc'
 $ tensorboard --logdir ./
+
+## mobilenet_v2
+$ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --output_stride=8 --eval_crop_size=1025 --eval_crop_size=2049 --dataset="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1
+
 ```
 
 ---------------------
 ### 5.3 A local `visualization` job using `xception_65` can be run with the following command:
 ```shell
 # run vis, From tensorflow/models/research/deeplab
-$ python vis.py --logtostderr --vis_split="val" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --vis_crop_size=1025 --vis_crop_size=2049 --dataset="cityscapes" --colormap_type="cityscapes" --checkpoint_dir=./datasets/model_zoo/deeplabv3_cityscapes_train --vis_logdir=./datasets/cityscapes/exp/train_on_train_set/vis --dataset_dir=./datasets/cityscapes/tfrecord
+$ python vis.py --logtostderr --vis_split="val" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --vis_crop_size=1025 --vis_crop_size=2049 --dataset="cityscapes" --colormap_type="cityscapes" --checkpoint_dir=./datasets/model_zoo/deeplabv3_cityscapes_train --vis_logdir=./datasets/cityscapes/exp/train_on_train_set/vis --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1
 
+# run vis, mobilenet_v2
+$ python vis.py --logtostderr --vis_split="val" --model_variant="mobilenet_v2"  --output_stride=8  --vis_crop_size=1025 --vis_crop_size=2049 --dataset="cityscapes" --colormap_type="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train --vis_logdir=./datasets/cityscapes/exp/train_on_train_set/vis --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1
 ## Get output file: 'datasets/cityscapes/exp/train_on_train_set/vis/segmentation_results'
 ```
 
@@ -1626,26 +1648,242 @@ $ python vis.py --logtostderr --vis_split="val" --model_variant="xception_65" --
 ### 5.4 A local `training` job using `xception_65` can be run with the following command::
 ```shell
 # run training, From tensorflow/models/research/deeplab
-$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=2 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/xception_65_coco_pretrained/x65-b2u1s2p-d48-2-3x256-sc-cr300k_init.ckpt.index --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord
+$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=2 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/xception_65_coco_pretrained/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord
+
+# --train_batch_size <= 2
 
 # Multi GPUs Training
-$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=2 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/xception_65_coco_pretrained/x65-b2u1s2p-d48-2-3x256-sc-cr300k_init.ckpt.index --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2
+$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=2 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/xception_65_coco_pretrained/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2
+## Fine tune From 'deeplabv3_cityscapes_train'
+$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=4 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --initialize_last_layer=False
+
+## mobilenet_v2
+$ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=8 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2
+
+## mobilenet_v2
+$ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=8 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=False
+
+
+## aquariusjay says:
+> ASPP should still work for `MobileNet-V2 backbone`.
+We do not use it because we target at faster inference speed instead of high performance when using MobileNet-V2.
 
 ## Get output file: 'datasets/cityscapes/exp/train_on_train_set/train'
+
 ```
 
+## `aquariusjay` commented on May 26, 2018
+> We use batch size 8 with crop size = 769x769, and output_stride = 16 on Cityscapes.
+Training with Batch norm is essential to attain high performance.
 
+> To `get the 82.1% performance` (on test set), you need to further train the model on all the `fine + coarse` annotations.
 
 --------------------------
 ## DeepLabv3+ Code Reading
 
 - [x] **deeplab_demo.ipynb**
 * 修改不用每次下载模型，从'ubuntu'盘读取模型。
+* `model_variant`
+```python
+_PREPROCESS_FN = {
+    'mobilenet_v2': _preprocess_zero_mean_unit_range,
+    'resnet_v1_50': _preprocess_subtract_imagenet_mean,
+    'resnet_v1_50_beta': _preprocess_zero_mean_unit_range,
+    'resnet_v1_101': _preprocess_subtract_imagenet_mean,
+    'resnet_v1_101_beta': _preprocess_zero_mean_unit_range,
+    'xception_41': _preprocess_zero_mean_unit_range,
+    'xception_65': _preprocess_zero_mean_unit_range,
+    'xception_71': _preprocess_zero_mean_unit_range,
+}
+```
+
+--------------------------
+# 2019.03.10
+## DeepLabv3+ Code Reading
+- [x] [TF.slim简单用法](https://www.jianshu.com/p/18747374ec28)
+* slim这个模块是在16年新推出的，其主要目的是来做所谓的“代码瘦身”。
+* 撇开`Keras，TensorLayer，tfLearn`这些个`高级库`不谈，光用tensorflow能不能写出简洁的代码？当然行，`有slim就够了`！
+* slim被放在tensorflow.contrib这个库下面，导入的方法如下：
+> import tensorflow.contrib.slim as slim
+
+* `slim`是一个使构建，训练，评估神经网络变得简单的库。它可以消除原生tensorflow里面很多重复的模板性的代码，让代码更紧凑，更具备可读性。另外slim提供了很多计算机视觉方面的著名模型（VGG, AlexNet等），我们不仅可以直接使用，甚至能以各种方式进行扩展。
+
+
+---------------------------
+# 2019.03.10
+### slim的子模块及功能介绍：
+* `arg_scope`: provides a new scope named arg_scope that allows a user to define default arguments for specific operations within that scope.
+除了基本的`namescope，variabelscope`外，又加了`argscope`，它是用来控制每一层的默认超参数的。
+
+* `data`: contains TF-slim's dataset definition, data providers, parallel_reader, and decoding utilities.
+
+* `evaluation`: contains routines for evaluating models.
+
+* `layers`: contains high level layers for building models using tensorflow.
+这个比较重要，slim的核心和精髓，一些复杂层的定义
+
+* `learning`: contains routines for training models.
+
+* `losses`: contains commonly used loss functions.
+
+* `metrics`: contains popular evaluation metrics.
+评估模型的度量标准
+
+* `nets`: contains popular network definitions such as VGG and AlexNet models.
+包含一些经典网络，VGG等，用的也比较多
+
+* `queues`: provides a context manager for easily and safely starting and closing QueueRunners.
+文本队列管理，比较有用。
+
+* `regularizers`: contains weight regularizers.
+包含一些正则规则
+
+* `variables`: provides convenience wrappers for variable creation and manipulation.
+这个比较有用，我很喜欢slim管理变量的机制
+
+* slim中实现一个层：
+> net = slim.conv2d(input, 128, [3, 3], scope='conv1_1')
+
+### slim中的`repeat`操作：
+```python
+## 定义三个相同的卷积层
+net = slim.conv2d(net, 256, [3, 3], scope='conv3_1')
+net = slim.conv2d(net, 256, [3, 3], scope='conv3_2')
+net = slim.conv2d(net, 256, [3, 3], scope='conv3_3')
+net = slim.max_pool2d(net, [2, 2], scope='pool2')
+# slim中的repeat操作可以减少代码量
+net = slim.repeat(net, 3, slim.conv2d, 256, [3, 3], scope='conv3')
+net = slim.max_pool2d(net, [2, 2], scope='pool2')
+```
+
+### `stack`是处理卷积核或者输出不一样的情况：
+```python
+# Verbose way:
+x = slim.fully_connected(x, 32, scope='fc/fc_1')
+x = slim.fully_connected(x, 64, scope='fc/fc_2')
+x = slim.fully_connected(x, 128, scope='fc/fc_3')
+# 使用stack操作：
+slim.stack(x, slim.fully_connected, [32, 64, 128], scope='fc')
+# 卷积层
+# 普通方法:
+x = slim.conv2d(x, 32, [3, 3], scope='core/core_1')
+x = slim.conv2d(x, 32, [1, 1], scope='core/core_2')
+x = slim.conv2d(x, 64, [3, 3], scope='core/core_3')
+x = slim.conv2d(x, 64, [1, 1], scope='core/core_4')
+# 简便方法:
+slim.stack(x, slim.conv2d, [(32, [3, 3]), (32, [1, 1]), (64, [3, 3]), (64, [1, 1])], scope='core')
+```
+
+### slim中的argscope
+```python
+with slim.arg_scope([slim.conv2d], padding='SAME',
+                      weights_initializer=tf.truncated_normal_initializer(stddev=0.01)
+                      weights_regularizer=slim.l2_regularizer(0.0005)):
+    net = slim.conv2d(inputs, 64, [11, 11], scope='conv1')
+	# 若想特别指定某些层的参数，可以重新赋值（相当于重写）
+    net = slim.conv2d(net, 128, [11, 11], padding='VALID', scope='conv2')
+    net = slim.conv2d(net, 256, [11, 11], scope='conv3')
+```
+
+### 定义一个VGG网络
+```python
+def vgg16(inputs):
+  with slim.arg_scope([slim.conv2d, slim.fully_connected],
+                      activation_fn=tf.nn.relu,
+                      weights_initializer=tf.truncated_normal_initializer(0.0, 0.01),
+                      weights_regularizer=slim.l2_regularizer(0.0005)):
+    net = slim.repeat(inputs, 2, slim.conv2d, 64, [3, 3], scope='conv1')
+    net = slim.max_pool2d(net, [2, 2], scope='pool1')
+    net = slim.repeat(net, 2, slim.conv2d, 128, [3, 3], scope='conv2')
+    net = slim.max_pool2d(net, [2, 2], scope='pool2')
+    net = slim.repeat(net, 3, slim.conv2d, 256, [3, 3], scope='conv3')
+    net = slim.max_pool2d(net, [2, 2], scope='pool3')
+    net = slim.repeat(net, 3, slim.conv2d, 512, [3, 3], scope='conv4')
+    net = slim.max_pool2d(net, [2, 2], scope='pool4')
+    net = slim.repeat(net, 3, slim.conv2d, 512, [3, 3], scope='conv5')
+    net = slim.max_pool2d(net, [2, 2], scope='pool5')
+    net = slim.fully_connected(net, 4096, scope='fc6')
+    net = slim.dropout(net, 0.5, scope='dropout6')
+    net = slim.fully_connected(net, 4096, scope='fc7')
+    net = slim.dropout(net, 0.5, scope='dropout7')
+    net = slim.fully_connected(net, 1000, activation_fn=None, scope='fc8')
+  return net
+```
+
+### 训练模型
+```python
+import tensorflow as tf
+vgg = tf.contrib.slim.nets.vgg
+ 
+# Load the images and labels.
+images, labels = ...
+ 
+# Create the model.
+predictions, _ = vgg.vgg_16(images)
+ 
+# Define the loss functions and get the total loss.
+loss = slim.losses.softmax_cross_entropy(predictions, labels)
+```
+
+### 定义自己的loss的方法
+```python
+# Load the images and labels.
+images, scene_labels, depth_labels, pose_labels = ...
+ 
+# Create the model.
+scene_predictions, depth_predictions, pose_predictions = CreateMultiTaskModel(images)
+ 
+# Define the loss functions and get the total loss.
+classification_loss = slim.losses.softmax_cross_entropy(scene_predictions, scene_labels)
+sum_of_squares_loss = slim.losses.sum_of_squares(depth_predictions, depth_labels)
+pose_loss = MyCustomLossFunction(pose_predictions, pose_labels)
+slim.losses.add_loss(pose_loss) # Letting TF-Slim know about the additional loss.
+ 
+# The following two ways to compute the total loss are equivalent:
+regularization_loss = tf.add_n(slim.losses.get_regularization_losses())
+total_loss1 = classification_loss + sum_of_squares_loss + pose_loss + regularization_loss
+ 
+# (Regularization Loss is included in the total loss by default).
+total_loss2 = slim.losses.get_total_loss()
+```
+
+### 读取保存模型变量
+```python
+# Create some variables.
+v1 = slim.variable(name="v1", ...)
+v2 = slim.variable(name="nested/v2", ...)
+...
+ 
+# Get list of variables to restore (which contains only 'v2').
+variables_to_restore = slim.get_variables_by_name("v2")
+ 
+# Create the saver which will be used to restore the variables.
+restorer = tf.train.Saver(variables_to_restore)
+ 
+with tf.Session() as sess:
+  # Restore variables from disk.
+  restorer.restore(sess, "/tmp/model.ckpt")
+  print("Model restored.")
+
+###########################################
+# 加载到不同名字的变量中
+def name_in_checkpoint(var):
+  return 'vgg16/' + var.op.name
+ 
+variables_to_restore = slim.get_model_variables()
+variables_to_restore = {name_in_checkpoint(var):var for var in variables_to_restore}
+restorer = tf.train.Saver(variables_to_restore)
+ 
+with tf.Session() as sess:
+  # Restore variables from disk.
+  restorer.restore(sess, "/tmp/model.ckpt")
+```
 
 
 
-- [ ] [Deeplab V3+ 源码解读及tf.estimator实践](https://blog.csdn.net/wangdongwei0/article/details/82959670)
-
+--------------------------
+# 2019.03.11
+## DeepLabv3+ Code Reading
 
 - [ ] [deeplabV3+源码分解学习](https://www.jianshu.com/p/d0cc35b3f100)
 github上deeplabV3+的源码是基于tensorflow（slim）简化的代码，是一款非常值得学习的标准框架结构
