@@ -1276,7 +1276,7 @@ $ ./darknet detector test cfg/voc-person.data cfg/yolov3-voc-person.cfg backup_p
 ### Inception的理念:
 * 首先通过一系列的 1x1 卷积来学习`cross-channel correlations`，同时将输入的维度降下来；再通过常规的 3x3 和 5x5 卷积来学习`spatial correlations`。这样一来，两个卷积模块分工明确。Inception V3 中的 module 如下图:
 
-![](https://ss.csdn.net/p?https://mmbiz.qpic.cn/mmbiz_jpg/VBcD02jFhgkMEHDUCLNw7T4Zq62RbCDLkgC65vBFz3wF7icagyJ4wNQEibUlGEgy25R9Yy7MFHBvuTG8JfFw4qRg/640)
+![](https://github.com/kinglintianxia/note_book/blob/master/imgs/xception_fig1.jpg)
 
 ### Inception的假设:
 * `corss-channels correlations` 和 `spatial correlations` 是`分开学习`的，而不是在某一个操作中共同学习的。
@@ -1284,17 +1284,17 @@ $ ./darknet detector test cfg/voc-person.data cfg/yolov3-voc-person.cfg backup_p
 ### Inception到Xception(Extreme Inception) 的转变
 1. 简版的Inception module:拿掉所有的pooling，并且只用一层3x3的卷积来提取spatial correlations，如Figure2。
 
-![](https://ss.csdn.net/p?https://mmbiz.qpic.cn/mmbiz_jpg/VBcD02jFhgkMEHDUCLNw7T4Zq62RbCDL3NkJrcj022o3ErWyuCzFEXwz4Sr8LK9o6eVqBGZyibxaMXgNokCOe5A/640)
+![](https://github.com/kinglintianxia/note_book/blob/master/imgs/xception_fig2.jpg)
 
 2. 简版Inception:可以将这些1x1的卷积用一个较大的 1x1 卷积来替代（也就是在`channel上进行triple`），再在这个较大卷积产生的feature map上分出三个不重叠的部分，进行`separable convolution`，如 Figure3。 
 
-![](https://ss.csdn.net/p?https://mmbiz.qpic.cn/mmbiz_jpg/VBcD02jFhgkMEHDUCLNw7T4Zq62RbCDLlgdsZ7yf5gzpVmNCS4djd1ia9NgRROSmCb30faXSo8tUaCJulOokfwQ/640)
+![](https://github.com/kinglintianxia/note_book/blob/master/imgs/xception_fig3.jpg)
 
 > 这样一来就自然而然地引出：为什么不是`分出多个`不重叠的部分，而是`分出三个`部分来进行 separable convolution 呢？如果加强一下 Inception 的假设，假设 cross-channel correlations 和 spatial correlations 是完全无关的呢？
 
 > 沿着上面的思路，一种`极端的情况`就是，在`每个channel`上进行 separable convolution，假设 1x1 卷积输出的 `feature map的channel有128个`，那么极端版本的Inception 就是在`每个channel`上进行3x3的卷积，而不是学习一个 3x3x128的kernel，取而代之的是`学习128个3x3的kernel`。 
 
-![](https://ss.csdn.net/p?https://mmbiz.qpic.cn/mmbiz_jpg/VBcD02jFhgkMEHDUCLNw7T4Zq62RbCDL9u5jywUz4ntjEbMn8CnzAN9yJfjUHmgNTsb92Y1U5Pokz3CXWqxKmA/640)
+![](https://github.com/kinglintianxia/note_book/blob/master/imgs/xception_fig4.jpg)
 
 3. Xception Architecture:一种`Xception module` 的线性堆叠，并且使用了`residual connection`(`残差单元`的输出由多个卷积层级联的输出和输入元素间相加)，数据依次流过`Entry flow`，`Middle flow` 和 `Exit flow`。
 
@@ -1628,7 +1628,7 @@ miou_1.0[0.935834229]
 ## Get output file: 'datasets/cityscapes/exp/train_on_train_set/eval/events.out.tfevents.1552031267.jun-pc'
 $ tensorboard --logdir ./
 
-## mobilenet_v2
+## run eval, mobilenet_v2
 $ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --output_stride=8 --eval_crop_size=1025 --eval_crop_size=2049 --dataset="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1
 
 ```
@@ -1654,14 +1654,17 @@ $ python train.py --logtostderr --training_number_of_steps=90000 --train_split="
 
 # Multi GPUs Training
 $ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=2 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/xception_65_coco_pretrained/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2
-## Fine tune From 'deeplabv3_cityscapes_train'
-$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=4 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --initialize_last_layer=False
+## Fine-tuning From 'deeplabv3_cityscapes_train', `re-use all the trained wieghts`
+$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=4 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=False 
 
-## mobilenet_v2
-$ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=8 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2
+## Fine-tuning From 'deeplabv3_cityscapes_train', `re-use only the network backbone`
+$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=4 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --initialize_last_layer=False --last_layers_contain_logits_only=False
 
-## mobilenet_v2
+## mobilenet_v2, `re-use all the trained wieghts`, set `initialize_last_layer=True`
 $ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=8 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=False
+
+## mobilenet_v2, `re-use all the trained weights except the logits`
+$ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=8 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=False --initialize_last_layer=False --last_layers_contain_logits_only=True
 
 
 ## aquariusjay says:
