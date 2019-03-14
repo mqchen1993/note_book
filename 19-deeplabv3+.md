@@ -8,6 +8,9 @@
 ![](https://github.com/kinglintianxia/note_book/blob/master/imgs/deeplab_v3+.png)
 
 ### DeepLabv3+使用Modified Aligned Xception，对Xception的改进如下:
+
+![](https://github.com/kinglintianxia/note_book/blob/master/imgs/Modified_Aligned_Xception.png)
+
 * 层数变深了.
 * 所有的`最大池化`都被`替换`成了`3x3 with stride 2` 的 Separable `Convolution`.
 * 在每个 3x3 Depthwise Separable Convolution 的后面加了 BN 和 ReLU.
@@ -128,6 +131,7 @@ poly,初始学习率乘以$(1-\frac{iter}{maxiter})^{power}$, where power=0.9,Th
 4. models/samples/core/tutorials/keras
 5. models/samples/core/tutorials/estimators
 6. models/tutorials/image
+7. models/research/slim
 
 
 --------------------------------------------
@@ -178,9 +182,9 @@ Finally, my setting is as follows:
     `initialize_last_layer=False`
     `last_layers_contain_logits_only=True`
 
-```
 
 * [ aquariusjay commented on Apr 11, 2018](https://github.com/tensorflow/models/issues/3730#issuecomment-380168917)
+
 > When you want to fine-tune DeepLab on other datasets, there are a few cases:
 
 1. You want to `re-use ALL the trained weigths`: set `initialize_last_layer = True` (last_layers_contain_logits_only does not matter in this case).
@@ -347,6 +351,7 @@ $ python train.py --logtostderr --training_number_of_steps=30000 --train_split="
 
 # run training, `re-use only the network backbone`
 # global step 20260: loss = 0.2941 (0.934 sec/step), miou_1.0[0.818994045]
+# global step 30000: loss = 0.2861 (0.878 sec/step), miou_1.0[0.826865256]
 $ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=513 --train_crop_size=513 --train_batch_size=8 --dataset="pascal_voc_seg" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_pascal_trainval/model.ckpt --train_logdir=./datasets/pascal_voc_seg/exp/train_on_train_set/train --dataset_dir=./datasets/pascal_voc_seg/tfrecord --num_clones=2 --fine_tune_batch_norm=False --initialize_last_layer=False --last_layers_contain_logits_only=False
 
 ## Get output file: 'datasets/pascal_voc_seg/exp/train_on_train_set/train'
@@ -362,7 +367,7 @@ We do not use it because we target at faster inference speed instead of high per
 ```
 
 ## `aquariusjay` commented on May 26, 2018
-> We use batch size 8 with crop size = 769x769, and output_stride = 16 on Cityscapes.
+> We use `batch size 8` with `crop size = 769x769`, and `output_stride = 16` on Cityscapes.
 Training with Batch norm is essential to attain high performance.
 
 > To `get the 82.1% performance` (on test set), you need to further train the model on all the `fine + coarse` annotations.
@@ -403,7 +408,7 @@ model_checkpoint_path: "./model.ckpt"
 all_model_checkpoint_paths: "./model.ckpt"
 
 # run eval, From tensorflow/models/research/deeplab
-$ python eval.py --logtostderr --eval_split="val" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --eval_crop_size=1025 --eval_crop_size=2049 --dataset="cityscapes" --checkpoint_dir=./datasets/model_zoo/deeplabv3_cityscapes_train --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1
+$ python eval.py --logtostderr --eval_split="val" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --eval_crop_size=1025 --eval_crop_size=2049 --dataset="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1
 ## Get 'Waiting for new checkpoint at...' 
 ## Terminal print
 INFO:tensorflow:Finished evaluation at 2019-03-08-07:49:00
@@ -414,6 +419,7 @@ $ tensorboard --logdir ./
 ## run eval, mobilenet_v2
 $ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --output_stride=8 --eval_crop_size=1025 --eval_crop_size=2049 --dataset="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1
 
+$ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --eval_crop_size=1025 --eval_crop_size=2049 --dataset="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1
 ```
 
 ---------------------
@@ -430,24 +436,44 @@ $ python vis.py --logtostderr --vis_split="val" --model_variant="mobilenet_v2"  
 ---------------------
 ### 5.4 A local `training` job using `xception_65` can be run with the following command::
 ```shell
+# 9W iters if fine for training.
 # run training, From tensorflow/models/research/deeplab
-$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=2 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/xception_65_coco_pretrained/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord
-
 # --train_batch_size <= 2
 
 # Multi GPUs Training
-$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=2 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/xception_65_coco_pretrained/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2
-## Fine-tuning From 'deeplabv3_cityscapes_train', `re-use all the trained wieghts` [OK]
+## Fine-tuning `re-use all the trained wieghts`, train_batch_size=1, [OK]
 $ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=1 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --fine_tune_batch_norm=False
+
+## Fine-tuning  `re-use all the trained wieghts`
+## global step 3550: loss = 1.6651 (0.626 sec/step), miou_1.0[0.149772376]
+$ python train.py --logtostderr --training_number_of_steps=10000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=2 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=False
  
 ## Fine-tuning From 'deeplabv3_cityscapes_train', `re-use only the network backbone`
 $ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=4 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=False --initialize_last_layer=False --last_layers_contain_logits_only=False
 
+## mobilenet_v2: miou_1.0[0.716534734](output_stride=8), miou_1.0[0.706700146](output_stride=16)
 ## mobilenet_v2, `re-use all the trained wieghts`, set `initialize_last_layer=True` [OK]
 $ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=8 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=False
 
+## mobilenet_v2, `re-use all the trained weights except the logits`
+## global step 800: loss = 1.0841 (0.842 sec/step), miou_1.0[0.013041365]
+## global step 2930: loss = 1.2053 (0.882 sec/step), miou_1.0[0.140691563]
+## global step 30000: loss = 1.2253 (0.839 sec/step), miou_1.0[0.146490291]
+$ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=8 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=False --initialize_last_layer=False --last_layers_contain_logits_only=True
+
+## mobilenet_v2, `re-use all the trained weights except the logits`
+## global step 30000: loss = 1.3792 (0.252 sec/step), miou_1.0[0.159074679]
+## step 51803, loss = 1.4126 (0.232 sec/step), miou_1.0[0.143954247]
+$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=8 --train_crop_size=769 --train_crop_size=769 --train_batch_size=2 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=False --initialize_last_layer=False --last_layers_contain_logits_only=True
+
+# 2019.03.14
 ## mobilenet_v2, `re-use only the network backbone`
-$ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=8 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=False --initialize_last_layer=False --last_layers_contain_logits_only=False
+## step 2000: loss = 1.3960 (0.680 sec/step), miou_1.0[0.0641207546]
+## global step 5050: loss = 1.1510 (0.632 sec/step), miou_1.0[0.0680430755]
+## add learning rate. --base_learning_rate=0.01
+## global step 15000: loss = 1.5850 (0.688 sec/step), miou_1.0[0.138460264]
+## 2019.03.15, 10:00 done!
+$ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=513 --train_crop_size=513 --train_batch_size=16 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False
 
 
 
@@ -504,24 +530,32 @@ $ python eval.py --logtostderr --eval_split="val" --model_variant="xception_65" 
 ### 6.3 A local `visualization` job using `xception_65` can be run with the following command:
 ```shell
 # run vis, From 'deeplabv3_cityscapes_train'
-$ python vis.py --logtostderr --vis_split="val" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --vis_crop_size=361 --vis_crop_size=481 --dataset="cityscapes" --colormap_type="cityscapes" --checkpoint_dir=./datasets/model_zoo/deeplabv3_cityscapes_train --vis_logdir=./datasets/camvid/exp/train_on_train_set/vis --dataset_dir=./datasets/camvid/tfrecord --max_number_of_iterations=1
+$ python vis.py --logtostderr --vis_split="val" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --vis_crop_size=361 --vis_crop_size=481 --dataset="camvid" --colormap_type="cityscapes" --checkpoint_dir=./datasets/camvid/exp/train_on_train_set/train --vis_logdir=./datasets/camvid/exp/train_on_train_set/vis --dataset_dir=./datasets/camvid/tfrecord --max_number_of_iterations=1
 
 ## Get output file: 'datasets/camvid/exp/train_on_train_set/vis/segmentation_results'
 ```
 
 ---------------------
 ### 6.4 A local `training` job using `xception_65` can be run with the following command::
+
 ```shell
 # run training, From tensorflow/models/research/deeplab
-# --train_batch_size <= 2
+
 ## Fine-tuning From 'deeplabv3_cityscapes_train', `re-use ALL the trained weights EXCEPT the logits`
-## step 3050: loss = 0.6069 (0.192 sec/step), miou_1.0[0.0278994814]
+## step 3050: loss = 0.6069 (0.192 sec/step), miou_1.0[0.0278994814], train_batch_size=1
 $ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=361 --train_crop_size=361 --train_batch_size=1 --dataset="camvid" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_cityscapes_train/model.ckpt --train_logdir=./datasets/camvid/exp/train_on_train_set/train --dataset_dir=./datasets/camvid/tfrecord --fine_tune_batch_norm=False --initialize_last_layer=False --last_layers_contain_logits_only=True
 
 ## Fine-tuning From 'deeplabv3_cityscapes_train', `re-use ALL the trained weights EXCEPT the logits`
 ## global step 5290: loss = 0.5241 (0.518 sec/step), miou_1.0[0.638597667]
 ## global step 30000: loss = 0.5131 (0.506 sec/step), miou_1.0[0.667017698]
 $ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=361 --train_crop_size=361 --train_batch_size=10 --dataset="camvid" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_cityscapes_train/model.ckpt --train_logdir=./datasets/camvid/exp/train_on_train_set/train --dataset_dir=./datasets/camvid/tfrecord --fine_tune_batch_norm=False --num_clones=2 --initialize_last_layer=False --last_layers_contain_logits_only=True
+
+## Fine-tuning From 'deeplabv3_cityscapes_train', `re-use only the network backbone`
+## global step 8960: loss = 0.6623 (0.619 sec/step), miou_1.0[0.497921795]
+## global step 13710: loss = 0.6310 (0.572 sec/step), miou_1.0[0.537117]
+## global step 30000: loss = 0.5538 (0.643 sec/step), miou_1.0[0.57864368]
+$ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=361 --train_crop_size=361 --train_batch_size=12 --dataset="camvid" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_cityscapes_train/model.ckpt --train_logdir=./datasets/camvid/exp/train_on_train_set/train --dataset_dir=./datasets/camvid/tfrecord --fine_tune_batch_norm=False --num_clones=2 --initialize_last_layer=False --last_layers_contain_logits_only=False
+
 ``` 
 
 
@@ -754,4 +788,41 @@ github上deeplabV3+的源码是基于tensorflow（slim）简化的代码，是�
 
 ![](https://img-blog.csdn.net/20180707103303371?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTE5NzQ2Mzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 2019.03.14
+## is:issue deeplab train is:closed 
+
+* The issue here is that your training batch size (--train_batch_size=4) is too small. You need to have a larger batch size. 
+
+
+* It seems I needed a much larger step length than the default. `1e-2` gives results closer to the published results, with batch size 15 and a smaller crop window size.
+
+* I want to train Cityscape with a trained model but summurize some Classes. For that i changed the `trainid` of some classes.
+
+* If I use the `export_model.py` without --decoder_output_stride=4 flag (as used in training) it always outputs 0.
+solution: adding the `--decoder_output_stride=4 flag`
+
+* Issues: Is it possible to get `94% mIOU` of pascal voc 'val' data?
+Ans: You are training with `trainval` dataset which means you've already include the `val set` during `training`. That usually results in `overfitting` in val dataset with `mIoU over 90%`.
+
+* To get the 82.1% performance (on test set), you need to further train the model on all the `fine + coarse` annotations.
+
+* deeplabv3+ how to print `per_class_iou`?
+[TensorFlow: How Can I get the total_cm in tf.contrib.metrics.streaming_mean_iou](https://stackoverflow.com/questions/40340728/tensorflow-how-can-i-get-the-total-cm-in-tf-contrib-metrics-streaming-mean-iou)
+
+[Deeplab——How to evaluate each class of iou](https://blog.csdn.net/zsf442553199/article/details/82217717)
 
