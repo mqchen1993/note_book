@@ -1443,16 +1443,54 @@ $ ./darknet detector train data/obj.data yolo-obj.cfg darknet53.conv.74 -map
 * There are 2 APIs:
 1. [C API](https://github.com/AlexeyAB/darknet/blob/master/include/darknet.h)
 2. [C++ API](https://github.com/AlexeyAB/darknet/blob/master/include/yolo_v2_class.hpp)
+<br>
 [C++ example that uses C++ API](https://github.com/AlexeyAB/darknet/blob/master/src/yolo_console_dll.cpp)
 
+
+----------------------------------------------
+# 2019.03.15
+- [x] **Check CityScapes tfrecord is correct?**
+* tfrecord correct.
+
+
+- [x] **Train MobileNet on VOC dataset**
+* mobilenet_v2, `re-use all the trained weights except the logits` [OK]
+global step 8890: loss = 0.3322 (0.205 sec/step), miou_1.0[0.706052244] <br>
+global step 30000: loss = 0.2057 (0.196 sec/step), miou_1.0[0.727050483]
+
+- [ ] **Show KittiSeg seg map**
+* demo.py L184 
+```python
+# output: [batch*height*width, NUM_CLASSES].
+output = sess.run([softmax], feed_dict=feed)    # Get probility image. <br>
+"""
+    output: 
+     [array([[9.9968946e-01, 3.1052253e-04],
+           [9.9980527e-01, 1.9472565e-04],
+           [9.9978584e-01, 2.1418222e-04],
+           ...,
+           [9.9948078e-01, 5.1923015e-04],
+           [9.9927455e-01, 7.2546635e-04],
+           [9.9853718e-01, 1.4628501e-03]], dtype=float32)]
+"""
+
+```
+* road
+
+![road](https://github.com/kinglintianxia/note_book/blob/master/imgs/demo_raw_road.png)
+
+* background
+
+![background](https://github.com/kinglintianxia/note_book/blob/master/imgs/demo_raw_bg.png)
 
 
 
 # ==TODO==
 
-- [ ] **Check CityScapes tfrecord is correct?**
-- [ ] **Train MobileNet on VOC dataset**
-- [ ] **Show KittiSeg seg map**
+
+
+
+
 - [ ] **Pooling -> Conv**
 - [ ] **输入Image手工添加其他特征channels，比如Canny,Gray,hsv, self-attention等**
 - [ ] **KittiBox 添加其他class**

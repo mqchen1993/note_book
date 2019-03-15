@@ -320,6 +320,9 @@ all_model_checkpoint_paths: "./model.ckpt"
 # run eval, From tensorflow/models/research/deeplab
 $ python eval.py --logtostderr --eval_split="val" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --eval_crop_size=513 --eval_crop_size=513 --dataset="pascal_voc_seg" --checkpoint_dir=./datasets/pascal_voc_seg/exp/train_on_train_set/train --eval_logdir=./datasets/pascal_voc_seg/exp/train_on_train_set/eval --dataset_dir=./datasets/pascal_voc_seg/tfrecord --max_number_of_iterations=1
 
+# run eval, mobilenet_v2
+$ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2"  --output_stride=16 --eval_crop_size=513 --eval_crop_size=513 --dataset="pascal_voc_seg" --checkpoint_dir=./datasets/pascal_voc_seg/exp/train_on_train_set/train --eval_logdir=./datasets/pascal_voc_seg/exp/train_on_train_set/eval --dataset_dir=./datasets/pascal_voc_seg/tfrecord --max_number_of_iterations=1
+
 ## Terminal print
 INFO:tensorflow:Finished evaluation at 2019-03-08-07:49:00
 miou_1.0[0.935834229]
@@ -331,6 +334,10 @@ $ tensorboard --logdir ./
 ```shell
 # run vis, From tensorflow/models/research/deeplab
 $ python vis.py --logtostderr --vis_split="val" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --vis_crop_size=513 --vis_crop_size=513 --dataset="pascal_voc_seg" --checkpoint_dir=./datasets/pascal_voc_seg/exp/train_on_train_set/train --vis_logdir=./datasets/pascal_voc_seg/exp/train_on_train_set/vis --dataset_dir=./datasets/pascal_voc_seg/tfrecord --max_number_of_iterations=1
+
+# run vis, mobilenet_v2
+$ python vis.py --logtostderr --vis_split="val" --model_variant="mobilenet_v2" --output_stride=16 --vis_crop_size=513 --vis_crop_size=513 --dataset="pascal_voc_seg" --checkpoint_dir=./datasets/pascal_voc_seg/exp/train_on_train_set/train --vis_logdir=./datasets/pascal_voc_seg/exp/train_on_train_set/vis --dataset_dir=./datasets/pascal_voc_seg/tfrecord --max_number_of_iterations=1
+
 
 ## Get output file: 'datasets/pascal_voc_seg/exp/train_on_train_set/vis/segmentation_results'
 ```
@@ -354,25 +361,15 @@ $ python train.py --logtostderr --training_number_of_steps=30000 --train_split="
 # global step 30000: loss = 0.2861 (0.878 sec/step), miou_1.0[0.826865256]
 $ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=513 --train_crop_size=513 --train_batch_size=8 --dataset="pascal_voc_seg" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_pascal_trainval/model.ckpt --train_logdir=./datasets/pascal_voc_seg/exp/train_on_train_set/train --dataset_dir=./datasets/pascal_voc_seg/tfrecord --num_clones=2 --fine_tune_batch_norm=False --initialize_last_layer=False --last_layers_contain_logits_only=False
 
+# 2019.03.15
+## mobilenet_v2, `re-use all the trained weights except the logits` [OK]
+## global step 8890: loss = 0.3322 (0.205 sec/step), miou_1.0[0.706052244]
+## global step 30000: loss = 0.2057 (0.196 sec/step), miou_1.0[0.727050483]
+$ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=16 --train_crop_size=513 --train_crop_size=513 --train_batch_size=8 --dataset="pascal_voc_seg" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_pascal_train_aug/model.ckpt-30000 --train_logdir=./datasets/pascal_voc_seg/exp/train_on_train_set/train --dataset_dir=./datasets/pascal_voc_seg/tfrecord --num_clones=2 --fine_tune_batch_norm=False --initialize_last_layer=False --last_layers_contain_logits_only=True
+
+
 ## Get output file: 'datasets/pascal_voc_seg/exp/train_on_train_set/train'
 ```
-
-
-## aquariusjay says:
-> ASPP should still work for `MobileNet-V2 backbone`.
-We do not use it because we target at faster inference speed instead of high performance when using MobileNet-V2.
-
-## Get output file: 'datasets/cityscapes/exp/train_on_train_set/train'
-
-```
-
-## `aquariusjay` commented on May 26, 2018
-> We use `batch size 8` with `crop size = 769x769`, and `output_stride = 16` on Cityscapes.
-Training with Batch norm is essential to attain high performance.
-
-> To `get the 82.1% performance` (on test set), you need to further train the model on all the `fine + coarse` annotations.
-
-
 
 -----------
 ### 5. CityScapes dataset
@@ -417,7 +414,7 @@ miou_1.0[0.935834229]
 $ tensorboard --logdir ./
 
 ## run eval, mobilenet_v2
-$ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --output_stride=8 --eval_crop_size=1025 --eval_crop_size=2049 --dataset="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1
+$ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --output_stride=16 --eval_crop_size=1025 --eval_crop_size=2049 --dataset="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1
 
 $ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --eval_crop_size=1025 --eval_crop_size=2049 --dataset="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1
 ```
@@ -466,14 +463,31 @@ $ python train.py --logtostderr --training_number_of_steps=30000 --train_split="
 ## step 51803, loss = 1.4126 (0.232 sec/step), miou_1.0[0.143954247]
 $ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=8 --train_crop_size=769 --train_crop_size=769 --train_batch_size=2 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=False --initialize_last_layer=False --last_layers_contain_logits_only=True
 
+# 2019.03.15
+## mobilenet_v2, `re-use all the trained weights except the logits` 
+## 19:00 will done.
+## step 6920: loss = 1.3736 (0.451 sec/step), miou_1.0[0.165405348]
+## step 10500: loss = 1.6515 (0.472 sec/step), miou_1.0[0.164520293]
+## 
+$ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=16 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=False --initialize_last_layer=False --last_layers_contain_logits_only=True
+
+
 # 2019.03.14
 ## mobilenet_v2, `re-use only the network backbone`
 ## step 2000: loss = 1.3960 (0.680 sec/step), miou_1.0[0.0641207546]
 ## global step 5050: loss = 1.1510 (0.632 sec/step), miou_1.0[0.0680430755]
 ## add learning rate. --base_learning_rate=0.01
 ## global step 15000: loss = 1.5850 (0.688 sec/step), miou_1.0[0.138460264]
-## 2019.03.15, 10:00 done!
-$ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=513 --train_crop_size=513 --train_batch_size=16 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False
+## step 24162: loss = 1.0039 (0.627 sec/step), miou_1.0[0.147770703]
+## step 72280: loss = 1.0993 (0.636 sec/step), miou_1.0[0.127960443]
+$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=513 --train_crop_size=513 --train_batch_size=16 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False
+
+# 2019.03.15
+## mobilenet_v2, `re-use only the network backbone`
+## global step 4490: loss = 1.2101 (0.694 sec/step), miou_1.0[0.150558829]
+## Recording summary at step 13160, loss = 1.3112 (0.656 sec/step), miou_1.0[0.140188307]
+## global step 58900: loss = 0.9697 (0.436 sec/step), miou_1.0[0.706700146]
+$ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=False --initialize_last_layer=False --last_layers_contain_logits_only=False --base_learning_rate=0.01
 
 
 
@@ -805,6 +819,16 @@ github上deeplabV3+的源码是基于tensorflow（slim）简化的代码，是�
 
 # 2019.03.14
 ## is:issue deeplab train is:closed 
+
+* `aquariusjay` says:
+> ASPP should still work for `MobileNet-V2 backbone`. `We do not use it` because we target at faster inference speed instead of high performance when using MobileNet-V2.
+
+
+* `aquariusjay` commented on May 26, 2018
+> We use `batch size 8` with `crop size = 769x769`, and `output_stride = 16` on Cityscapes.
+Training with Batch norm is essential to attain high performance.
+<br>
+> To `get the 82.1% performance` (on test set), you need to further train the model on all the `fine + coarse` annotations.
 
 * The issue here is that your training batch size (--train_batch_size=4) is too small. You need to have a larger batch size. 
 
