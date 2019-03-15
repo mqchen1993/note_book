@@ -1458,7 +1458,7 @@ $ ./darknet detector train data/obj.data yolo-obj.cfg darknet53.conv.74 -map
 global step 8890: loss = 0.3322 (0.205 sec/step), miou_1.0[0.706052244] <br>
 global step 30000: loss = 0.2057 (0.196 sec/step), miou_1.0[0.727050483]
 
-- [ ] **Show KittiSeg seg map**
+- [x] **Show KittiSeg seg map**
 * demo.py L184 
 ```python
 # output: [batch*height*width, NUM_CLASSES].
@@ -1473,7 +1473,9 @@ output = sess.run([softmax], feed_dict=feed)    # Get probility image. <br>
            [9.9927455e-01, 7.2546635e-04],
            [9.9853718e-01, 1.4628501e-03]], dtype=float32)]
 """
-
+# road 
+    output_image = output[0][:, 1].reshape(shape[0], shape[1])
+	out_bg = output[0][:, 0].reshape(shape[0], shape[1])
 ```
 * road
 
@@ -1486,10 +1488,6 @@ output = sess.run([softmax], feed_dict=feed)    # Get probility image. <br>
 
 
 # ==TODO==
-
-
-
-
 
 - [ ] **Pooling -> Conv**
 - [ ] **输入Image手工添加其他特征channels，比如Canny,Gray,hsv, self-attention等**

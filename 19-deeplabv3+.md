@@ -426,7 +426,7 @@ $ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2"
 $ python vis.py --logtostderr --vis_split="val" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --vis_crop_size=1025 --vis_crop_size=2049 --dataset="cityscapes" --colormap_type="cityscapes" --checkpoint_dir=./datasets/model_zoo/deeplabv3_cityscapes_train --vis_logdir=./datasets/cityscapes/exp/train_on_train_set/vis --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1
 
 # run vis, mobilenet_v2
-$ python vis.py --logtostderr --vis_split="val" --model_variant="mobilenet_v2"  --output_stride=8  --vis_crop_size=1025 --vis_crop_size=2049 --dataset="cityscapes" --colormap_type="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train --vis_logdir=./datasets/cityscapes/exp/train_on_train_set/vis --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1
+$ python vis.py --logtostderr --vis_split="val" --model_variant="mobilenet_v2"  --output_stride=16  --vis_crop_size=1025 --vis_crop_size=2049 --dataset="cityscapes" --colormap_type="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train --vis_logdir=./datasets/cityscapes/exp/train_on_train_set/vis --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1
 ## Get output file: 'datasets/cityscapes/exp/train_on_train_set/vis/segmentation_results'
 ```
 
