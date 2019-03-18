@@ -33,7 +33,11 @@
 * 发现 Tensoflow Object API: 'models/research/object_detection'
 * 在语义分割基准 PASCAL VOC 2012 上，`MobileNetV1` 与 `MobileNetV2` 作为特征提取器表现相当，但是后者所需的参数量减少了 5.3 倍，在 Multiply-Adds 方面 operations 也减少了 5.2 倍。
 
-![](http://t11.baidu.com/it/u=12420451,879245165&fm=173&app=25&f=JPEG?w=640&h=100)
+|	Model					|	Params	| 	Multiply-Adds	|	mIOU	|
+|	------					|	------	|	------			|	------	|
+| MobileNetV1 + DeepLabV3	|	11.15M	|	14.25B			|	75.29%	|
+| MobileNetV2 + DeepLabV3	|	2.11M	|	2.75B			|	75.32%	|
+	
 
 
 --------------------
@@ -71,6 +75,7 @@ Linear Bottleneck 通过去掉Eltwise+ 的特征去掉ReLU， 减少ReLU对特�
 > 上图中，利用`nxm`的矩阵B将张量（2D，即m=2）变换到`n维`的空间中，通过ReLU后（y=ReLU(Bx)），再用此矩阵之逆恢复原来的张量。可以看到，当n较小时，恢复后的张量坍缩严重，n较大时则恢复较好。
 
 * [Caffe Implementation of Google's MobileNets (v1 and v2)](https://github.com/shicai/MobileNet-Caffe)
+
 [vis of MobileNetV2(NetScope)](http://ethereon.github.io/netscope/#/gist/d01b5b8783b4582a42fe07bd46243986) <br>
 
 [vis of MobileNetV2(Netron)](http://lutzroeder.github.io/netron/?gist=d01b5b8783b4582a42fe07bd46243986)
@@ -92,6 +97,9 @@ Linear Bottleneck 通过去掉Eltwise+ 的特征去掉ReLU， 减少ReLU对特�
 * 之前用过 `MobileNet V1` 的准确率不错，更重要的是速度很快，在 `Jetson TX2`上都能达到`38 FPS`的帧率.
 
 ### 1. 对比 MobileNet V1 与 V2 的微结构
+
+![MobileNetV1_V2](https://github.com/kinglintianxia/note_book/blob/master/imgs/MobileNetV1_V2.png)
+
 * 都采用 Depth-wise (DW) 卷积搭配 Point-wise (PW) 卷积的方式来提特征。这两个操作合起来也被称为 `Depth-wise Separable Convolution`，之前在 Xception 中被广泛使用。
 这么做的好处是理论上可以成倍的减少卷积层的`时间复杂度和空间复杂度`, 因为`卷积核的尺寸K` 通常远小于输出通道数 $C_{out}$，因此标准卷积的计算复杂度近似为`DW + PW`组合卷积的 $K^2$倍。
 
@@ -101,6 +109,9 @@ Linear Bottleneck 通过去掉Eltwise+ 的特征去掉ReLU， 减少ReLU对特�
 论文作者称其为 Linear Bottleneck。这么做的原因，是因为作者认为`激活函数在高维空间能够有效的增加非线性，而在低维空间时则会破坏特征，不如线性的效果好`。由于第二个 PW 的主要功能就是降维，因此按照上面的理论，降维之后就不宜再使用 ReLU6 了。
 
 ### 2. 对比 ResNet 与 MobileNet V2 的微结构
+
+![MobileNetV2_ResNet](https://github.com/kinglintianxia/note_book/blob/master/imgs/MobileNetV2_ResNet.png)
+
 * MobileNet V2 借鉴 ResNet，都采用了 [1x1 -> 3x3 -> 1x1] 的模式.
 * MobileNet V2 借鉴 ResNet，同样使用 `Shortcut`将输出与输入相加.
 * ResNet 使用`标准卷积`提特征，MobileNet 始终使用`DW卷积`提特征。
@@ -130,7 +141,7 @@ Linear Bottleneck 通过去掉Eltwise+ 的特征去掉ReLU， 减少ReLU对特�
 
 --------------------
 ## MobileNetV2
-- [ ] [Google AI Blog](https://ai.googleblog.com/2018/04/mobilenetv2-next-generation-of-on.html)
+- [x] [Google AI Blog](https://ai.googleblog.com/2018/04/mobilenetv2-next-generation-of-on.html)
 
 * MobileNetV2: The Next Generation of On-Device Computer Vision Networks 
 * MobileNetV2 is a very effective `feature extractor` for `object detection` and `segmentation`.
