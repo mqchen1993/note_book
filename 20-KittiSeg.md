@@ -12,7 +12,7 @@ $ python train.py --hypes hypes/KittiSeg.json
 $ python evaluate.py
 ```
 
-# FCN论文中作者给出的在VOC2011数据集上的 `Pixel Accuracy`为90.3, mean IoU（即多个类别IoU的平均值，具体看我之前给你写的‘语义分割评价指标‘，IoU即单个类别计算结果，IoU=TP/(TP+FN+FP)）为62.7
+# FCN论文中作者给出的在VOC2011数据集上的 `Pixel Accuracy`为90.3, mean IoU（即多个类别IoU的平均值，IoU即单个类别计算结果，IoU=TP/(TP+FN+FP)）为62.7
 # Kitti Road benchmark（http://www.cvlibs.net/datasets/kitti/eval_road.php）
 * 目前最好的模型MaxF1:97.05 %， AP：93.53 %； MultiNet 分别为：93.99 % 	93.24 %
 * Kitti Road 用MaxF1和AP作为评价指标，这都是像素分类的评价指标，应该时数据集只有单个类别，这样评价比较合理）
@@ -37,14 +37,19 @@ Shape of upscore32[1 384 1248 2]
 
 # 1. KittiSeg(FCN-8s) 在 Kitti Road 数据集上训练结果(在kitti road评价)（作者给的模型，基于VGG16）：
 ```shell
-2019-01-24 22:55:40,039 INFO Evaluation Succesfull. Results:
-2019-01-24 22:55:40,040 INFO     `MaxF1  :  96.0821` 
-2019-01-24 22:55:40,040 INFO     BestThresh  :  14.5098 
-2019-01-24 22:55:40,040 INFO     Average Precision  :  92.3620 
-2019-01-24 22:55:40,040 INFO     `Pixel Accuracy  :  97.8370` 
-2019-01-24 22:55:40,040 INFO     IOU  :  89.4572 
-2019-01-24 22:55:40,040 INFO     Speed (msec)  :  88.4474 
-2019-01-24 22:55:40,040 INFO     Speed (fps)  :  11.3062 
+2019-03-17 14:43:39,416 root INFO Evaluation Succesfull. Results:
+2019-03-17 14:43:39,417 root INFO     [train] MaxF1  :  98.2527 
+2019-03-17 14:43:39,417 root INFO     [train] BestThresh  :  25.8824 
+2019-03-17 14:43:39,417 root INFO     [train] Average Precision  :  92.5427 
+2019-03-17 14:43:39,417 root INFO     [train] Pixel Accuracy  :  98.7000 
+2019-03-17 14:43:39,417 root INFO     [train] IOU  :  94.3077 
+2019-03-17 14:43:39,417 root INFO     [val] MaxF1  :  96.0821 
+2019-03-17 14:43:39,418 root INFO     [val] BestThresh  :  14.5098 
+2019-03-17 14:43:39,418 root INFO     [val] Average Precision  :  92.3620 
+2019-03-17 14:43:39,418 root INFO     [val] Pixel Accuracy  :  97.8370 
+2019-03-17 14:43:39,418 root INFO     [val] IOU  :  89.4572 
+2019-03-17 14:43:39,418 root INFO     Speed (msec)  :  92.2093 
+2019-03-17 14:43:39,418 root INFO     Speed (fps)  :  10.8449
 ```
 
 # 2. KittiSeg(FCN) 在 Kitti Road 数据集上训练结果(在kitti road评价)（基于ResNet101）：
@@ -66,19 +71,19 @@ Shape of upscore32[1 384 1248 2]
 
 # 3. KittiSeg(FCN) 在 Kitti Road + CityScapes 数据集上训练(在kitti road评价)结果（基于ResNet101）：
 ```shell
-2019-01-24 23:24:14,275 INFO Evaluation Succesfull. Results:
-2019-01-24 23:24:14,275 INFO     [train] MaxF1  :  98.1683 
-2019-01-24 23:24:14,275 INFO     [train] BestThresh  :  76.8627 
-2019-01-24 23:24:14,275 INFO     [train] Average Precision  :  92.5292 
-2019-01-24 23:24:14,275 INFO     [train] Pixel Accuracy  :  98.7130 
-2019-01-24 23:24:14,275 INFO     [train] IOU  :  94.5232 
-2019-01-24 23:24:14,275 INFO     `[val] MaxF1  :  96.7849` 
-2019-01-24 23:24:14,276 INFO     [val] BestThresh  :  67.0588 
-2019-01-24 23:24:14,276 INFO     `[val] Average Precision  :  92.3420` 
-2019-01-24 23:24:14,276 INFO     [val] Pixel Accuracy  :  98.3321 
-2019-01-24 23:24:14,276 INFO     [val] IOU  :  92.4040 
-2019-01-24 23:24:14,276 INFO     Speed (msec)  :  49.6830 
-2019-01-24 23:24:14,276 INFO     Speed (fps)  :  20.1276 
+2019-03-17 14:43:39,416 root INFO Evaluation Succesfull. Results:
+2019-03-17 14:43:39,417 root INFO     [train] MaxF1  :  98.2527 
+2019-03-17 14:43:39,417 root INFO     [train] BestThresh  :  25.8824 
+2019-03-17 14:43:39,417 root INFO     [train] Average Precision  :  92.5427 
+2019-03-17 14:43:39,417 root INFO     [train] Pixel Accuracy  :  98.7000 
+2019-03-17 14:43:39,417 root INFO     [train] IOU  :  94.3077 
+2019-03-17 14:43:39,417 root INFO     [val] MaxF1  :  96.0821 
+2019-03-17 14:43:39,418 root INFO     [val] BestThresh  :  14.5098 
+2019-03-17 14:43:39,418 root INFO     [val] Average Precision  :  92.3620 
+2019-03-17 14:43:39,418 root INFO     [val] Pixel Accuracy  :  97.8370 
+2019-03-17 14:43:39,418 root INFO     [val] IOU  :  89.4572 
+2019-03-17 14:43:39,418 root INFO     Speed (msec)  :  92.2093 
+2019-03-17 14:43:39,418 root INFO     Speed (fps)  :  10.8449
 ```
 
 # 3. KittiSeg(FCN) 在 Kitti Road + CityScapes 数据集上训练(在Kitti Road + CityScapes验证集上评价)结果（基于ResNet101）：
@@ -172,3 +177,106 @@ Shape of upscore32[1 384 1248 2]
 2019-01-30 01:33:06,221 root INFO     [val] IOU (smooth) :  47.0834 
 2019-01-30 01:33:06,221 root INFO     Speed (msec) (smooth) :  62.1653 
 2019-01-30 01:33:06,221 root INFO     Speed (fps) (smooth) :  16.1108 
+
+
+
+
+# 2019.03.16
+## Train KittiSeg 12000 steps.
+$ python train.py --hypes hypes/KittiSeg.json
+
+2019-03-16 19:02:50,780 INFO Raw Results:
+2019-03-16 19:02:50,780 INFO     [train] MaxF1 (raw)    :  98.2408 
+2019-03-16 19:02:50,780 INFO     [train] BestThresh (raw)    :  26.6667 
+2019-03-16 19:02:50,780 INFO     [train] Average Precision (raw)    :  92.5310 
+2019-03-16 19:02:50,780 INFO     [train] Pixel Accuracy (raw)    :  98.8959 
+2019-03-16 19:02:50,780 INFO     [train] IOU (raw)    :  95.3772 
+2019-03-16 19:02:50,780 INFO     [val] MaxF1 (raw)    :  96.0302 
+2019-03-16 19:02:50,780 INFO     [val] BestThresh (raw)    :  3.5294 
+2019-03-16 19:02:50,780 INFO     [val] Average Precision (raw)    :  92.3470 
+2019-03-16 19:02:50,780 INFO     [val] Pixel Accuracy (raw)    :  97.9453 
+2019-03-16 19:02:50,780 INFO     [val] IOU (raw)    :  90.0512 
+2019-03-16 19:02:50,780 INFO     Speed (msec) (raw)    :  95.2221 
+2019-03-16 19:02:50,780 INFO     Speed (fps) (raw)    :  10.5018 
+2019-03-16 19:02:50,781 INFO Smooth Results:
+2019-03-16 19:02:50,782 INFO     [train] MaxF1 (smooth) :  97.7540 
+2019-03-16 19:02:50,782 INFO     [train] BestThresh (smooth) :  56.8627 
+2019-03-16 19:02:50,782 INFO     [train] Average Precision (smooth) :  92.4949 
+2019-03-16 19:02:50,782 INFO     [train] Pixel Accuracy (smooth) :  98.7652 
+2019-03-16 19:02:50,782 INFO     [train] IOU (smooth) :  94.7236 
+2019-03-16 19:02:50,782 INFO     [val] MaxF1 (smooth) :  95.9915 
+2019-03-16 19:02:50,782 INFO     [val] BestThresh (smooth) :  11.9608 
+2019-03-16 19:02:50,782 INFO     [val] Average Precision (smooth) :  92.2666 
+2019-03-16 19:02:50,782 INFO     [val] Pixel Accuracy (smooth) :  98.0390 
+2019-03-16 19:02:50,782 INFO     [val] IOU (smooth) :  90.6612 
+2019-03-16 19:02:50,782 INFO     Speed (msec) (smooth) :  92.6641 
+2019-03-16 19:02:50,782 INFO     Speed (fps) (smooth) :  10.7917 
+
+## Run evalute.py
+Modify L32 & L65
+$ python evaluate.py
+
+
+-------------------------------------------
+# 2019.03.17
+## Add 'poly' and 'sigmoid binary loss', VGG16 backbone
+## Train KittiSeg 20000 steps.
+2019-03-17 14:28:04,374 root INFO Evaluation Succesfull. Results:
+2019-03-17 14:28:04,374 root INFO     [train] MaxF1  :  98.7262 
+2019-03-17 14:28:04,374 root INFO     [train] BestThresh  :  49.4118 
+2019-03-17 14:28:04,374 root INFO     [train] Average Precision  :  92.5369 
+2019-03-17 14:28:04,374 root INFO     [train] Pixel Accuracy  :  99.1284 
+2019-03-17 14:28:04,374 root INFO     [train] IOU  :  96.6643 
+2019-03-17 14:28:04,374 root INFO     [val] MaxF1  :  95.9890 
+2019-03-17 14:28:04,374 root INFO     [val] BestThresh  :  11.7647 
+2019-03-17 14:28:04,374 root INFO     [val] Average Precision  :  92.3498 
+2019-03-17 14:28:04,374 root INFO     [val] Pixel Accuracy  :  98.1753 
+2019-03-17 14:28:04,374 root INFO     `[val] IOU  :  91.4111`
+2019-03-17 14:28:04,374 root INFO     Speed (msec)  :  92.0982 
+2019-03-17 14:28:04,374 root INFO     Speed (fps)  :  10.8580 
+
+## KittiSeg_pretrained, VGG16 backbone
+2019-03-17 14:43:39,416 root INFO Evaluation Succesfull. Results:
+2019-03-17 14:43:39,417 root INFO     [train] MaxF1  :  98.2527 
+2019-03-17 14:43:39,417 root INFO     [train] BestThresh  :  25.8824 
+2019-03-17 14:43:39,417 root INFO     [train] Average Precision  :  92.5427 
+2019-03-17 14:43:39,417 root INFO     [train] Pixel Accuracy  :  98.7000 
+2019-03-17 14:43:39,417 root INFO     [train] IOU  :  94.3077 
+2019-03-17 14:43:39,417 root INFO     [val] MaxF1  :  96.0821 
+2019-03-17 14:43:39,418 root INFO     [val] BestThresh  :  14.5098 
+2019-03-17 14:43:39,418 root INFO     [val] Average Precision  :  92.3620 
+2019-03-17 14:43:39,418 root INFO     [val] Pixel Accuracy  :  97.8370 
+2019-03-17 14:43:39,418 root INFO     `[val] IOU  :  89.4572`
+2019-03-17 14:43:39,418 root INFO     Speed (msec)  :  92.2093 
+2019-03-17 14:43:39,418 root INFO     Speed (fps)  :  10.8449
+
+
+--------------------------------------------
+# 2019.03.18
+## Add 'sigmoid binary loss', ResNet101 backbone
+## Train KittiSeg 8000 steps.
+2019-03-18 15:12:24,300 root INFO Evaluation Succesfull. Results:
+2019-03-18 15:12:24,301 root INFO     [train] MaxF1  :  99.2250 
+2019-03-18 15:12:24,301 root INFO     [train] BestThresh  :  62.7451 
+2019-03-18 15:12:24,301 root INFO     [train] Average Precision  :  92.5445 
+2019-03-18 15:12:24,301 root INFO     [train] Pixel Accuracy  :  99.3457 
+2019-03-18 15:12:24,301 root INFO     [train] IOU  :  97.8440 
+2019-03-18 15:12:24,302 root INFO     [val] MaxF1  :  96.4281 
+2019-03-18 15:12:24,302 root INFO     [val] BestThresh  :  4.7059 
+2019-03-18 15:12:24,302 root INFO     [val] Average Precision  :  92.1679 
+2019-03-18 15:12:24,302 root INFO     [val] Pixel Accuracy  :  98.3554 
+2019-03-18 15:12:24,302 root INFO     [val] IOU  :  92.4162 
+2019-03-18 15:12:24,302 root INFO     Speed (msec)  :  64.7850 
+2019-03-18 15:12:24,303 root INFO     Speed (fps)  :  15.4357 
+
+* Run `evalute.py` Error:
+ValueError: You can only pass an initializer function that expects no arguments to its callable when the shape is not fully defined. The given initializer function expects the following args ['self', 'shape', 'dtype', 'partition_info']
+
+
+
+
+
+
+
+
+

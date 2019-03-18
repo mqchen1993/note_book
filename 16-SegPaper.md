@@ -475,11 +475,11 @@ By dividing it into (2×2) sections (because the output size is 2×2) we get:
 * [Mask R-CNN 论文翻译](https://alvinzhu.xyz/2017/10/07/mask-r-cnn/#fn:18)
 * [Mask R-CNN完整翻译](https://blog.csdn.net/myGFZ/article/details/79136610)
 * `RoIPool` performs coarse spatial quantizationfor feature extraction. To fix the misalignment, we propose a simple, quantization-free layer, called `RoIAlign`, that faithfully preserves exact spatial locations.
-*  Second, we found it essential to decouple mask and class prediction: we predict a binary mask for each class independently, without competition among classes, and rely on the network’s RoI classification branch to predict the category. 
+*  Second, we found it essential to `decouple mask and class prediction`: we predict a `binary mask` for each class independently, without competition among classes, and rely on the network’s RoI `classification branch` to predict the category. 
 * Our models can run at about 200ms per frame on a GPU, and training on COCO takes one to two days on a single 8-GPU machine. 
 * Instead, our method is based on `parallel prediction of masks and class labels`, which is simpler and more flexible.
-* The `mask branch` has a Km2-dimensional output for `each RoI`, which encodes K binary masks of resolution m × m, one for each of the `K classes`.
-* For an RoI associated with ground-truth class k, Lmask is only defined on the k-th mask (other mask outputs do not contribute to the loss).
+* The `mask branch` has a [K*m^2]-dimensional output for `each RoI`, which encodes K binary masks of resolution m × m, one for each of the `K classes`.
+* For an RoI associated with `ground-truth class k`, $L_{mask}$ is only defined on the `k-th mask` (other mask outputs do not contribute to the loss).
 * we rely on the dedicated classification branch to predict the class label used to `select the output mask`. 
 * collapsing it into a `vector representation` that `lacks spatial dimensions`.
 * `RoIPool` is a standard operation for extracting a small feature map (e.g., 7×7) from each RoI
@@ -1242,6 +1242,7 @@ $ ./darknet detector test cfg/voc-person.data cfg/yolov3-voc-person.cfg backup_p
 
 ----------------------
 ## DANet
+## Paper Reading
 - [x] [DANet PPT](https://blog.csdn.net/mieleizhi0522/article/details/83111183) 
 * SOTA(State of the art).
 * 位置注意力模块(spatial-wise self-attention)通过所有位置的特征加权总和选择的性的聚集每个位置的特征，无论距离远近，相似的特征都会相互关联。(**类似于全连接条件随机场CRF**)
@@ -1278,18 +1279,35 @@ $ ./darknet detector test cfg/voc-person.data cfg/yolov3-voc-person.cfg backup_p
 ![](https://img-blog.csdn.net/20181017154457283?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21pZWxlaXpoaTA1MjI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
 * Visualization of Attention Module:
+We observe that the `position attention module` could capture `clear semantic similarity` and longrange relationships.
 
 ![](https://github.com/kinglintianxia/note_book/blob/master/imgs/DANet_Vis.png)
 
 ![](https://img-blog.csdn.net/20181017154534719?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21pZWxlaXpoaTA1MjI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
+## Update 2019.03.17
 * 对于通道注意力模块来说，很难直接给出关于注意力图的可视化理解:
+Instead, We find that the response of `specific semantic` is noticeable after `channel attention module` enhances. For example, `11th channel map` responds to the ’car’ class in all three examples, and `4th channel map` is for the ’vegetation’ class, which benefits for the segmentation of two scene categories
 
 ![](https://img-blog.csdn.net/2018101715462287?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21pZWxlaXpoaTA1MjI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
 
 * MultiGrid:
 
 ![](https://img-blog.csdn.net/20181017154717952?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21pZWxlaXpoaTA1MjI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
+## Update 2019.03.17
+
+### Implementation Details
+* we employ a `poly` learning rate policy
+The `base learning rate` is set to `0.01` for `Cityscapes` dataset. `Momentum` and `weight decay` coefficients are set to `0.9 and 0.0001` respectively.
+
+* We train our model with `Synchronized BN`. `Batchsize` are set to `8 for Cityscapes` and
+`16 for other datasets`.When adopting multi-scale augmentation, 
+
+* we set `training time` to `180 epochs for COCO` Stuff and `240 epochs for other datasets`.
+
+* we also adopt `auxiliary supervision` on the top of two `attention modules`.
 
 
 ------------------------------------------------------
@@ -1330,6 +1348,7 @@ see [19-deeplabv3+.md](https://github.com/kinglintianxia/note_book/blob/master/1
 | DeepLabv2	|	70.4		|
 | DeepLabv3 |	81.3		|
 | DeepLabv3+|	82.1		|
+| DANet 	|	81.5		|
 | PSPNet	|	81.2		|
 
 
@@ -1339,30 +1358,6 @@ see [19-deeplabv3+.md](https://github.com/kinglintianxia/note_book/blob/master/1
 Cityscapes is a recently released dataset for semantic urban scene understanding. It contains `5,000 high quality pixel-level finely annotated images` collected from 50 cities in different seasons. <br>
 The images are divided into sets with numbers `2,975`, `500`, and `1,525` for `training`, `validation` and `testing`. It defines `19 categories` containing both stuff and objects. Also, `20,000 coarsely annotated` images are provided for two settings in comparison.
 
-
-----------------------------------------------
-# 2019.03.14
-## MobileNetV2
-- [x] **Paper Reading**
-### MobileNetV2
-* Based on an `inverted residual` structure where the shortcut connections are between the thin bottleneck layers. The intermediate expansion layer uses lightweight depthwise convolutions to filter features as a source of non-linearity. 
-* Additionally, we find that it is important to `remove non-linearities in the narrow layers` in order to maintain representational power.
-
-### Semantic Segmentation
-* we compare `MobileNetV1` and `MobileNetV2` models used as feature extractors with `DeepLabv3`.
-* we experimented with three design variations: 
-1. different feature extractors, 
-2. simplifying the DeepLabv3 heads for faster computation,
-3. different inference strategies for boosting the performance.
-
-* We have observed that (Table 7): 
-1. the inference strategies, including multi-scale inputs and adding leftright flipped images, significantly increase the MAdds and thus are not suitable for on-device applications,
-2. using `output stride = 16` is more efficient than `output stride = 8`
-3.  `MobileNetV1` is already a `powerful feature extractor` and only requires about 4.9−5.7 times fewer `MAdds`(number of multiply-adds operators) than `ResNet-101` (e.g., mIOU:78.56 vs 82.70, and MAdds: 941.9B vs 4870.6B)
-4. It is more efficient to build DeepLabv3 heads on top of `the second last feature map` of `MobileNetV2` than on the original last-layer feature map, since the second to last feature map contains 320 channels instead of 1280
-5. `DeepLabv3` heads are computationally expensive and `removing the ASPP module` significantly reduces the MAdds with only a slight performance degradation. 
-
-* Notably, our architecture combined with the SSDLite detection module is 20× less computation and 10× less parameters than YOLOv2.
 
 
 
@@ -1501,19 +1496,209 @@ output = sess.run([softmax], feed_dict=feed)    # Get probility image. <br>
 ------------------------------------------------
 # 2019.03.16
 
-- [ ] **KittiSeg `seg map` 中使用`per-pixel sigmoid` and a `binary loss`**
-## Review Mask-RCNN
+- [x] **KittiSeg `seg map` 中使用`per-pixel sigmoid` and a `binary loss`**
+* Review Mask-RCNN Paper.
+
+## Read [Detectron](https://github.com/facebookresearch/Detectron)
+* [INSTALL.md](https://github.com/facebookresearch/Detectron/blob/master/INSTALL.md)
+* [GETTING_STARTED.md](https://github.com/facebookresearch/Detectron/blob/master/GETTING_STARTED.md)
+
+# Update 2019.03.17
+Find how implement `per-pixel sigmoid` and a `binary loss`. 
+```python
+"""Add Mask R-CNN specific losses."""
+loss_mask = model.net.`SigmoidCrossEntropyLoss`(
+    [blob_mask, 'masks_int32'],
+    'loss_mask',
+    scale=model.GetLossScale() * cfg.MRCNN.WEIGHT_LOSS_MASK
+)
+```
+
+
+
+## Read tensorflow Mask R-CNN code: [FastMaskRCNN](https://github.com/CharlesShang/FastMaskRCNN).
+Find how implement `per-pixel sigmoid` and a `binary loss`.
+
+* FastMaskRCNN/libs/nets/pyramid_network.py#L538
+
+```python
+# mask_targets = slim.one_hot_encoding(mask_targets, 2, on_value=1.0, off_value=0.0)
+# mask_binary_loss = mask_lw * tf.losses.softmax_cross_entropy(mask_targets, masks)
+# NOTE: w/o competition between classes. 
+mask_targets = tf.cast(mask_targets, tf.float32)
+"""
+For instance, one could perform multilabel classification where a picture can contain 
+both an elephant and a dog at the same time.
+tf.nn.sigmoid_cross_entropy_with_logits(
+    _sentinel=None,
+    labels=None,
+    logits=None,
+    name=None
+)
+Computes sigmoid cross entropy given logits.
+For brevity, let x = logits, z = labels. The logistic loss is:
+z * -log(sigmoid(x)) + (1 - z) * -log(1 - sigmoid(x))
+"""
+# mask_targets: learning targets of shape (M, pooled_height, pooled_width, num_classes) in {0, 1} values.
+# mask: (N, h, w, num_classes)   
+mask_loss = mask_lw * `tf.nn.sigmoid_cross_entropy_with_logits(labels=mask_targets, logits=masks)` 
+mask_loss = tf.reduce_mean(mask_loss) 
+"""
+tf.cond(
+    pred,
+    true_fn=None,
+    false_fn=None,
+    strict=False,
+    name=None,
+    fn1=None,
+    fn2=None
+)
+Return true_fn() if the predicate pred is true else false_fn(). (deprecated arguments)
+"""
+mask_loss = tf.cond(tf.greater(tf.size(labels), 0), lambda: mask_loss, lambda: tf.constant(0.0))
+tf.add_to_collection(tf.GraphKeys.LOSSES, mask_loss)
+mask_losses.append(mask_loss)
+
+```
+
+
+## Train KittiSeg 12000 steps.
+see `KittiSeg.md`
+
+
+----------------------
+- [x] **KittiSeg add `poly` learning rate**
+## deeplab code: 'deeplab/utils/train_utils.py#L162'
+```python
+  """Gets model's learning rate.
+
+  Computes the model's learning rate for different learning policy.
+  Right now, only "step" and "poly" are supported.
+  (1) The learning policy for "step" is computed as follows:
+    current_learning_rate = base_learning_rate *
+      learning_rate_decay_factor ^ (global_step / learning_rate_decay_step)
+  See tf.train.exponential_decay for details.
+  (2) The learning policy for "poly" is computed as follows:
+    current_learning_rate = base_learning_rate *
+      (1 - global_step / training_number_of_steps) ^ learning_power
+
+  Args:
+    learning_policy: 				Learning rate policy for training.
+    base_learning_rate: 			The base learning rate for model training.
+    learning_rate_decay_step: 		Decay the base learning rate at a fixed step.
+    learning_rate_decay_factor: 	The rate to decay the base learning rate.
+    training_number_of_steps: 		Number of steps for training.
+    learning_power: 				Power used for 'poly' learning policy.
+    slow_start_step: 				Training model with small learning rate for the first
+      few steps.
+    slow_start_learning_rate: 		The learning rate employed during slow start.
+
+  Returns:
+    Learning rate for the specified learning policy.
+
+  Raises:
+    ValueError: If learning policy is not recognized.
+  """
+  global_step = tf.train.get_or_create_global_step()
+  if learning_policy == 'step':
+    learning_rate = tf.train.exponential_decay(
+        base_learning_rate,
+        global_step,
+        learning_rate_decay_step,
+        learning_rate_decay_factor,
+        staircase=True)
+  elif learning_policy == 'poly':
+    learning_rate = tf.train.polynomial_decay(
+        base_learning_rate,
+        global_step,
+        training_number_of_steps,
+        end_learning_rate=0,
+        power=learning_power)
+  else:
+    raise ValueError('Unknown learning policy.')
+
+  # Employ small learning rate at the first few steps for warm start.
+  return tf.where(global_step < slow_start_step, slow_start_learning_rate,
+                  learning_rate)
+
+```
+
+----------------------
+- [x] **解决道路label包含ignore的问题**
+
+* [How to train on your own data](https://github.com/MarvinTeichmann/KittiSeg/blob/master/docu/inputs.md)
+* `batch_size` 和 `reseize_image | crop_patch`对立.
+## Find Answer!
+`road` 和`background`取反了
+```python
+# label: [batch, height, width, class]
+road = tf.expand_dims(tf.to_float(label[:, :, :, 1]), 3)
+tf.summary.image(tensor_name + '/gt_image', road)
+# king@2019.03.15
+# add gt_bg to show.
+gt_bg = tf.expand_dims(tf.to_float(label[:, :, :, 0]), 3)
+tf.summary.image(tensor_name + '/gt_bg', gt_bg)
+
+```
+
+
+
+----------------
+- [x] **KittiSeg add logits to tensorboard**
+* `KittiSeg/submodules/TensorVision/tensorvision/core.py#L89`
+
+
+
+--------------
+# 2019.03.17
+
+- [x] **Train KittiSeg**
+* Add 'poly' and 'sigmoid binary loss'
+* VGG16 backbone
+* In logits I See 'checkerboard pattern'
+
+![kitti_checkerboard_pattern](https://github.com/kinglintianxia/note_book/blob/master/imgs/kitti_checkerboard_pattern.png)
+
+
+-----------------------
+## Kitti Road submission
+
+### Data format for result submission:
+* For submission, results must be transfered into the Birds Eye View (BEV).
+* see “python/transform2BEV.py” for further details.
+* Faild !!
 
 
 
 
 
 
+-----------------------
+- [x] **Best threshold**
+* KittiSeg/submodules/evaluation/kitti_devkit/seg_utils.py
+```python
+# F-measure operation point
+beta = 1.0
+betasq = beta**2
+F = (1 + betasq) * (precision * recall)/((betasq * precision) + recall + 1e-10)
+index = F.argmax()
+MaxF= F[index]
+# BestThresh
+if thresh is not None:
+        BestThresh= thresh[index]
+        prob_eval_scores['BestThresh'] = BestThresh
+```
+
+----------------------------------------------
+# 2019.03.18
+- [x] **Train KittiSeg ResNet101**
+Not Better ? <br>
+Need to evalute on `Test` set.
 
 
-
-
-
+-----------------------
+## MobileNetV2
+see `21-MobileNetV2.md`
 
 
 
@@ -1521,17 +1706,26 @@ output = sess.run([softmax], feed_dict=feed)    # Get probility image. <br>
 
 
 # ==TODO==
+
+# 2019.03.18
+
+- [ ] **MobileNetV2 code**
+- [ ] **DeepLab code**
+- [ ] **Train DeepLab**
+
 - [ ] **在seg map 中使用`per-pixel sigmoid` and a `binary loss`**
-- [ ] **KittiSeg add poly learning rate**
-- [ ] **Pooling -> Conv**
+- [ ] **在FCN Decoder 中加入多个seg loss (ROI Align生成feature map),训练网络。**
 - [ ] **输入Image手工添加其他特征channels，比如Canny,Gray,hsv, self-attention等**
+- [ ] **Pooling -> Conv**
+- [ ] **handle checkerboard pattern**
+
 - [ ] **KittiBox 添加其他class**
 - [ ] **MultiNet基础上修改，完成道路分割、车辆、行人等检测(或+分割)**
-- [ ] **在FCN Decoder 中加入多个seg loss (ROI Align生成feature map),训练网络。**
+
 - [ ] **YOLOv3添加Segmap**
 - [ ] **+ DANet**
 - [ ] **labelme my own dataset**
-- [ ] **handle checkerboard pattern**
+
 
 
 
