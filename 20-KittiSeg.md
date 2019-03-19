@@ -151,6 +151,7 @@ Shape of upscore32[1 384 1248 2]
 ```
 
 # 7. KittiSeg 在 CityScapes(only bus) 数据集上训练结果（基于ResNet101）：
+```python
 2019-01-30 01:33:06,219 root INFO Raw Results:
 2019-01-30 01:33:06,219 root INFO     [train] MaxF1 (raw)    :  93.7513 
 2019-01-30 01:33:06,219 root INFO     [train] BestThresh (raw)    :  69.4118 
@@ -177,12 +178,13 @@ Shape of upscore32[1 384 1248 2]
 2019-01-30 01:33:06,221 root INFO     [val] IOU (smooth) :  47.0834 
 2019-01-30 01:33:06,221 root INFO     Speed (msec) (smooth) :  62.1653 
 2019-01-30 01:33:06,221 root INFO     Speed (fps) (smooth) :  16.1108 
-
+```
 
 
 
 # 2019.03.16
 ## Train KittiSeg 12000 steps.
+```python
 $ python train.py --hypes hypes/KittiSeg.json
 
 2019-03-16 19:02:50,780 INFO Raw Results:
@@ -211,7 +213,7 @@ $ python train.py --hypes hypes/KittiSeg.json
 2019-03-16 19:02:50,782 INFO     [val] IOU (smooth) :  90.6612 
 2019-03-16 19:02:50,782 INFO     Speed (msec) (smooth) :  92.6641 
 2019-03-16 19:02:50,782 INFO     Speed (fps) (smooth) :  10.7917 
-
+```
 ## Run evalute.py
 Modify L32 & L65
 $ python evaluate.py
@@ -221,6 +223,7 @@ $ python evaluate.py
 # 2019.03.17
 ## Add 'poly' and 'sigmoid binary loss', VGG16 backbone
 ## Train KittiSeg 20000 steps.
+```python
 2019-03-17 14:28:04,374 root INFO Evaluation Succesfull. Results:
 2019-03-17 14:28:04,374 root INFO     [train] MaxF1  :  98.7262 
 2019-03-17 14:28:04,374 root INFO     [train] BestThresh  :  49.4118 
@@ -234,8 +237,10 @@ $ python evaluate.py
 2019-03-17 14:28:04,374 root INFO     `[val] IOU  :  91.4111`
 2019-03-17 14:28:04,374 root INFO     Speed (msec)  :  92.0982 
 2019-03-17 14:28:04,374 root INFO     Speed (fps)  :  10.8580 
+```
 
 ## KittiSeg_pretrained, VGG16 backbone
+```python
 2019-03-17 14:43:39,416 root INFO Evaluation Succesfull. Results:
 2019-03-17 14:43:39,417 root INFO     [train] MaxF1  :  98.2527 
 2019-03-17 14:43:39,417 root INFO     [train] BestThresh  :  25.8824 
@@ -249,12 +254,13 @@ $ python evaluate.py
 2019-03-17 14:43:39,418 root INFO     `[val] IOU  :  89.4572`
 2019-03-17 14:43:39,418 root INFO     Speed (msec)  :  92.2093 
 2019-03-17 14:43:39,418 root INFO     Speed (fps)  :  10.8449
-
+```
 
 --------------------------------------------
 # 2019.03.18
 ## Add 'sigmoid binary loss', ResNet101 backbone
 ## Train KittiSeg 8000 steps.
+```python
 2019-03-18 15:12:24,300 root INFO Evaluation Succesfull. Results:
 2019-03-18 15:12:24,301 root INFO     [train] MaxF1  :  99.2250 
 2019-03-18 15:12:24,301 root INFO     [train] BestThresh  :  62.7451 
@@ -268,7 +274,7 @@ $ python evaluate.py
 2019-03-18 15:12:24,302 root INFO     [val] IOU  :  92.4162 
 2019-03-18 15:12:24,302 root INFO     Speed (msec)  :  64.7850 
 2019-03-18 15:12:24,303 root INFO     Speed (fps)  :  15.4357 
-
+```
 * Run `evalute.py` Error:
 ValueError: You can only pass an initializer function that expects no arguments to its callable when the shape is not fully defined. The given initializer function expects the following args ['self', 'shape', 'dtype', 'partition_info']
 
