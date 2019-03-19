@@ -79,7 +79,9 @@ Linear Bottleneck 通过去掉Eltwise+ 的特征去掉ReLU， 减少ReLU对特�
 [vis of MobileNetV2(NetScope)](http://ethereon.github.io/netscope/#/gist/d01b5b8783b4582a42fe07bd46243986) <br>
 
 [vis of MobileNetV2(Netron)](http://lutzroeder.github.io/netron/?gist=d01b5b8783b4582a42fe07bd46243986)
-
+* conv2_1/expand: 1x1 Conv, 6xchannels, point-wise
+* conv2_1/dwise:  3x3 Conv, depth-wise
+* conv2_1/linear: 1x1 Conv, 1/6channels, point-wise
 
 
 ### ReLU6
@@ -134,9 +136,9 @@ Linear Bottleneck 通过去掉Eltwise+ 的特征去掉ReLU， 减少ReLU对特�
 * 表述前后不一致。`论文`里面文字描述说有`19个 Bottleneck Residual Block`，但是之后给出的网络结构表（`论文中的Table 2`）里却只列出了`17个`。Table 2 第五行的 stride 和第六行的输入尺寸也是矛盾的。最后一行的输入通道数应该是1280而不是k。最后似乎也没有用 Softmax，不知道是否有意为之等等。
 
 
-### MobileNetV2 网路结构图：
+### MobileNetV2 网络结构图:
 
-![MobileNetV2](https://pic1.zhimg.com/v2-8387d7ca2bed54e6f55bc0d5984bc6d4_r.jpg)
+[MobileNetV2](https://pic1.zhimg.com/v2-8387d7ca2bed54e6f55bc0d5984bc6d4_r.jpg)
 
 
 --------------------
@@ -144,11 +146,63 @@ Linear Bottleneck 通过去掉Eltwise+ 的特征去掉ReLU， 减少ReLU对特�
 - [x] [Google AI Blog](https://ai.googleblog.com/2018/04/mobilenetv2-next-generation-of-on.html)
 
 * MobileNetV2: The Next Generation of On-Device Computer Vision Networks 
+* [Official tensorflow code](https://github.com/tensorflow/models/tree/master/research/slim/nets/mobilenet)
 * MobileNetV2 is a very effective `feature extractor` for `object detection` and `segmentation`.
 
 * [Tensorflow Object Detection API](https://github.com/tensorflow/models/tree/master/research/object_detection)
 
 
 ![MobileNetV2 Building block](https://1.bp.blogspot.com/-M8UvZJWNW4E/WsKk-tbzp8I/AAAAAAAAChw/OqxBVPbDygMIQWGug4ZnHNDvuyK5FBMcQCLcBGAs/s1600/image5.png)
+
+
+
+-----------------------
+# 2019.03.18
+## MobileNetV2
+- [x] **MobileNetV2 Code Reading**
+* [Official tensorflow code](https://github.com/tensorflow/models/tree/master/research/slim/nets/mobilenet)
+* Keep in mind that warm-starting from `a checkpoint` affects the model's weights `only during the initialization` of the model. Once a model has started training, `a new checkpoint` will be created in ${TRAIN_DIR}. If the fine-tuning training is `stopped and restarted`, this new checkpoint will be the one from which weights are restored and `not the ${checkpoint_path}$`.
+
+* Typically for `fine-tuning` one only want train a sub-set of layers, so the flag `--trainable_scopes` allows to specify which subsets of layers should trained, the rest would remain frozen.
+
+* models/tree/master/research/slim/README.md
+### Run label image in C++
+
+* Run `mobilenet_example.ipynb` Succeed!
+Note: `base_name` must be `Absolute directory`.
+
+* @slim.add_arg_scope
+```python
+"""
+并不是所有的方法都能用arg_scope设置默认参数, 只有用@slim.add_arg_scope修饰过的方法才能使用arg_scope. 
+所以, 要使slim.arg_scope正常运行起来, 需要两个步骤:
+
+1. 用@add_arg_scope修饰目标函数
+2. 用with arg_scope(...) 设置默认参数.
+"""
+@slim.add_arg_scope 
+def fn(a, b, c=3): 
+	d = c + b 
+	print("a={}, b={}".format(a, b)) 
+	return d 
+
+with slim.arg_scope([fn], a = 1): 
+	fn(b = 2)
+
+```
+
+* mobilenet.py/mobilenet_base()
+`output_stride`: An integer that specifies the requested ratio of input to output spatial resolution. `If not None`, then we invoke `atrous convolution` if necessary to prevent the network from reducing the spatial resolution of the activation maps. 
+`Allowed values` are 1 or any even number, `excluding zero`. Typical values are 8 (accurate fully convolutional mode), 16 (fast fully convolutional mode), and 32 (classification mode).
+
+* `mobilenet_example.ipynb` -> `mobilenet_v2.py` -> `mobilenet.py` -> `conv_blocks.py`
+
+
+
+
+
+
+
+
 
 

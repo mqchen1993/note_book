@@ -22,3 +22,6 @@
 ```shell
 $ sudo scp root@192.168.1.106:~/facedetect/result.bmp ~/Documents/am437x/facedetect/
 ```
+
+# ssh copy
+$ scp -r jun@jun-git:/home/jun/Documents/Detectron/ /home/king/Documents/

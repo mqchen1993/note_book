@@ -1505,6 +1505,7 @@ output = sess.run([softmax], feed_dict=feed)    # Get probility image. <br>
 
 # Update 2019.03.17
 Find how implement `per-pixel sigmoid` and a `binary loss`. 
+In 'Detectron/detectron/modeling/mask_rcnn_heads.py'
 ```python
 """Add Mask R-CNN specific losses."""
 loss_mask = model.net.`SigmoidCrossEntropyLoss`(
@@ -1701,17 +1702,36 @@ Need to evalute on `Test` set.
 see `21-MobileNetV2.md`
 
 
+-----------------------
+## MobileNetV2
+- [x] **MobileNetV2 Code Reading**
+* [Official tensorflow code](https://github.com/tensorflow/models/tree/master/research/slim/nets/mobilenet)
+see `21-MobileNetV2.md`
+
+-----------------------
+## MobileNetV2
+- [x] **Train DeepLab xception_65**
+### xception_65, cityscapes, `re-use only the network backbone`
+Not better enough! <br>
+miou_1.0[0.722017109] VS 80.42%(OS=8) 
+放弃 'xception_65'
 
 
+-----------------------
+## MobileNetV2
+- [ ] **DeepLab Code Reading**
+see `19-deeplabv3+.md`
 
+-----------------------
+# 2019.03.19
+- [ ] **Training cityscapes coarse dataset**
 
 # ==TODO==
 
 # 2019.03.18
 
-- [ ] **MobileNetV2 code**
-- [ ] **DeepLab code**
-- [ ] **Train DeepLab**
+
+
 
 - [ ] **在seg map 中使用`per-pixel sigmoid` and a `binary loss`**
 - [ ] **在FCN Decoder 中加入多个seg loss (ROI Align生成feature map),训练网络。**

@@ -64,3 +64,9 @@ $ python train.py --hypes hypes/multinet2.json
 $ python cityscapesScripts/cityscapesscripts/evaluation/evalPixelLevelSemanticLabeling.py
 ```
 
+
+# Coarse dataset 
+* 'gt_Coarse/train_extra': 19998 files.
+* fine + coarse: 24998
+* `gt_Coarse` 生成的`*_gtCoarse_labelTrainIds.png`只有黑白两色?
+
