@@ -26,6 +26,27 @@ root
    |-- test
    |-- train
     -- val
+
+# Train class id
+[128, 64, 128],  # trainId 0: 'road'
+[244, 35, 232],  # trainId 1: 'sidewalk'
+[70, 70, 70],    # trainId 2: 'building'
+[102, 102, 156], # trainId 3: 'wall'
+[190, 153, 153], # trainId 4: 'fence'
+[153, 153, 153], # trainId 5: 'pole'
+[250, 170, 30],  # trainId 6: 'traffic light'
+[220, 220, 0],   # trainId 7: 'traffic sign'
+[107, 142, 35],  # trainId 8: 'vegetation'
+[152, 251, 152], # trainId 9: 'terrain'
+[70, 130, 180],  # trainId 10: 'sky'
+[220, 20, 60],   # trainId 11: 'person'
+[255, 0, 0],     # trainId 12: 'rider'
+[0, 0, 142],     # trainId 13: 'car'
+[0, 0, 70],      # trainId 14: 'truck'
+[0, 60, 100],    # trainId 15: 'bus'
+[0, 80, 100],    # trainId 16: 'train'
+[0, 0, 230],     # trainId 17: 'motorcycle'
+[119, 11, 32],   # trainId 18: 'bicycle'
 ```
 
 ---

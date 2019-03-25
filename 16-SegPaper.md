@@ -105,6 +105,7 @@ $$ AP = \int_0^1 {p(r)} dr $$
 * [Deconvolutions](https://distill.pub/2016/deconv-checkerboard/)
 * LinkNet: A feature map with shape [H, W, n_channels] is first convolved with a [1x1] kernel to get a feature map with shape [H, W, n_channels / 4 ] and then a deconvolution takes it to [2*H, 2*W, n_channels / 4 ] a final [1x1] kernel convolution to take it to [2*H, 2*W, n_channels / 2 ]. Thus the decoder block fewer parameters due to this channel reduction scheme.
 
+--------------------
 # 2019.01.20
 - [x] **[Deconvolutions]**
 * [link](https://distill.pub/2016/deconv-checkerboard/)
@@ -116,9 +117,11 @@ $$ AP = \int_0^1 {p(r)} dr $$
 
 ![](https://distill.pub/2016/deconv-checkerboard/assets/upsample_DeconvTypes.svg)
 
+* We’ve had our `best results` with `nearest-neighbor interpolation`, and had `difficulty making bilinear resize work`.
 * We don’t necessarily think that either approach is the final solution to upsampling, but they do fix the checkerboard artifacts.
 * Whenever we `compute the gradients of a convolutional layer`, we do `deconvolution` (transposed convolution) on the `backward pass`.
 
+--------------------
 - [x] **[2017-course_by_Tao Kong.pdf]**
 * The region proposal network is a FCN which outputs `K*(4+2) sized vectors`.
 * `Mask R-CNN` = Faster R-CNN with FCN on ROIs.
@@ -129,15 +132,18 @@ $$ AP = \int_0^1 {p(r)} dr $$
 [R-FCN](https://github.com/daijifeng001/R-FCN)
 [Tensorflow detector](https://github.com/tensorflow/models/tree/master/research/object_detection)
 
+--------------------
 # 2019.01.21
 - [x] **基于深度卷积神经网络的目标检测算法研究_黄莉芝.caj**
 * 注意力模型
 * 语义分割分为“阈值分割”，“边缘分割”， “区域分割”
 * 计算边框回归
 
+--------------------
 # 2019.01.22
 - [x] **看第四章“目标定位优化”** 
 
+--------------------
 - [x] **专知[目标检测专栏]**
 * [link](https://mp.weixin.qq.com/s?__biz=MzU2OTA0NzE2NA==&mid=2247485072&idx=2&sn=e9f4f0d1daeb3a144e37fcfcc61e908f&chksm=fc85e783cbf26e95d153af7c825ef9b8fc4fc6fd37f75709de98eae769e6b70f8da29ae65a73&scene=21#wechat_redirect)
 * [CVPR'17 Tutorial](http://deeplearning.csail.mit.edu/)
@@ -146,19 +152,23 @@ $$ AP = \int_0^1 {p(r)} dr $$
 Done Reading !
 * 下载了[Bounding-box_regression详解.pdf]
 
+--------------------
 - [x] **[RCNN, Fast-RCNN, Faster-RCNN的一些事]**
 * [link](http://closure11.com/rcnn-fast-rcnn-faster-rcnn%E7%9A%84%E4%B8%80%E4%BA%9B%E4%BA%8B/)
 * 在Fast-RCNN中，作者巧妙的把bbox regression放进了神经网络内部，与region分类和并成为了一个multi-task模型
 * Bounding-box Regression
 * 我的CVPR 2016论文里自己弄的一个数据集就借助了Fast-RCNN.（`可以利用现有分割网络进行数据集粗略分割`）
 
+--------------------
 - [x] **[目标检测——从RCNN到Faster RCNN 串烧]**
 * [link](https://blog.csdn.net/xyy19920105/article/details/50817725)
 
+--------------------
 # 2019.01.24 计划
 - [x] **[机器学习随笔]**
 * [link](https://zhuanlan.zhihu.com/p/35058212)
 
+--------------------
 - [x] **[图像语义分割+FCN/U-Net]**
 * [link](https://zhuanlan.zhihu.com/p/31428783)
 * [visualization of FCN](http://ethereon.github.io/netscope/#/preset/fcn-8s-pascal)
@@ -177,6 +187,7 @@ Conv: $out = (in+2*pad-kernel)/stride + 1$
 DeConv: $out = (in-1)*stride + kernel -2*pad$
 And Now: $34 = (16-1)*2+4-2*0$
 
+-------------------
 # 2019.01.25 
 - [x] **[FCN学习:Semantic Segmentation]**
 * [link](https://zhuanlan.zhihu.com/p/22976342)
@@ -205,6 +216,7 @@ And Now: $34 = (16-1)*2+4-2*0$
 * 矩阵微分公式:
 $$\frac {d(Ax+b)}{dx} = {A^T}$$
 
+--------------------
 # 2019.01.26
 - [x] **[一文读懂Faster RCNN]**
 * [link](https://zhuanlan.zhihu.com/p/31426458)
@@ -212,7 +224,7 @@ $$\frac {d(Ax+b)}{dx} = {A^T}$$
 ![Faster R-CNN](https://pic4.zhimg.com/80/v2-e64a99b38f411c337f538eb5f093bdf3_hd.jpg)
 * bounding box regression原理
 * 对于一副任意大小PxQ图像,传入Faster RCNN前首先reshape到固定MxN,im_info=[M, N, scale_factor]则保存了此次缩放的所有信息,然后经过Conv Layers,经过4次pooling变为WxH=(M/16)x(N/16)大小,其中feature_stride=16则保存了该信息,用于计算anchor偏移量.
-------
+--------
 ## update 2019.02.27
 * VGG Feature Map: "conv5_3".
 * 9个anchors(矩形)共有3种形状，长宽比为大约为{width:height} = {1:1, 1:2, 2:1} 三种(ps. 每种比例有三个尺度)，如图所示:
@@ -1719,23 +1731,106 @@ miou_1.0[0.722017109] VS 80.42%(OS=8)
 
 -----------------------
 ## MobileNetV2
-- [ ] **DeepLab Code Reading**
+- [x] **DeepLab Code Reading**
 see `19-deeplabv3+.md`
 
+
+
 -----------------------
-# 2019.03.19
-- [ ] **Training cityscapes coarse dataset**
+# 2019.03.21
+- [x] add `eval.py` per-class IoU.
+- [x] add `sigmoid_cross_entropy` in `deeplab/utils/train_utils.py`
+
+-----------------------
+# 2019.03.22
+- [x] **理清tensor 尺寸变化**
+* 'model.py/split_separable_conv2d'
+
+* Shape: 
+`mobilenet_v2(Atros Conv)`: output_stride -> `ASPP`: output_stride -> `Decoder`: + short cut `layer_4`: OS=8 -> decoder_output_stride -> `ASPP`: decoder_output_stride
+
+
+|	net					|	shape					|
+|	------				|	------					|
+| backbone(Atros Conv)	|	[batch, os, os, 320]	|
+|	ASPP(dropout 0.1)	|	[batch, os, os, 256]	|
+| Decoder+layer_4(OS=8)	|	decoder_output_stride	|
+|	ASPP				|	decoder_output_stride	|
+
+
+
+-------------------------
+# 2019.03.23
+- [x] **ASPP 仿照 PSPNet `Concat` 原feature map**
+`deeplab/model.py#L441`
+
+- [x] **add `multi_loss` seg map**
+see `19-deeplabv3+.md`
+
+
+-----------------
+# 2019.03.25
+- [x] **eval time**
+* `deeplab_demo.ipynb`
+('---eval time: ', 152.82487869262695) ms.
+
+
 
 # ==TODO==
 
-# 2019.03.18
+--------------
+# 2019.03.25
+- [ ] **decoder_output_stride=1**
 
 
 
+--------------
+- [ ] **self-attention**
+
+
+
+---------------------------
+- [ ] **Better Upsampling**
+```python
+tf.image.resize_images(
+    images,
+    size,
+    method=ResizeMethod.BILINEAR,		# ResizeMethod.NEAREST_NEIGHBOR
+    align_corners=False,
+    preserve_aspect_ratio=False
+)
+
+# 
+tf.image.resize_nearest_neighbor(
+    images,
+    size,
+    align_corners=False,
+    name=None
+)
+# Resize images to size using nearest neighbor interpolation.
+
+```
+
+--------------
+- [ ] **计算网络 Params & Multiply-Adds**
+- [ ] **输入Image手工添加其他特征channels，比如Canny,Gray,hsv, self-attention等**
+
+
+--------------
+- [ ] **搞清`atrous convolution` code实现**
+
+
+--------------
+- [ ] **Training cityscapes coarse dataset**
+* `gt_Coarse` 生成的`*_gtCoarse_labelTrainIds.png`只有黑白两色?
+暂时放置
+
+
+- [ ] **+ DANet**
 
 - [ ] **在seg map 中使用`per-pixel sigmoid` and a `binary loss`**
 - [ ] **在FCN Decoder 中加入多个seg loss (ROI Align生成feature map),训练网络。**
-- [ ] **输入Image手工添加其他特征channels，比如Canny,Gray,hsv, self-attention等**
+
 - [ ] **Pooling -> Conv**
 - [ ] **handle checkerboard pattern**
 
@@ -1743,7 +1838,7 @@ see `19-deeplabv3+.md`
 - [ ] **MultiNet基础上修改，完成道路分割、车辆、行人等检测(或+分割)**
 
 - [ ] **YOLOv3添加Segmap**
-- [ ] **+ DANet**
+
 - [ ] **labelme my own dataset**
 
 

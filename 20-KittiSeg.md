@@ -17,7 +17,7 @@ $ python evaluate.py
 * 目前最好的模型MaxF1:97.05 %， AP：93.53 %； MultiNet 分别为：93.99 % 	93.24 %
 * Kitti Road 用MaxF1和AP作为评价指标，这都是像素分类的评价指标，应该时数据集只有单个类别，这样评价比较合理）
 
-# CityScapes benchmark（https://www.cityscapes-dataset.com/benchmarks/#scene-labeling-task）
+# [CityScapes benchmark](https://www.cityscapes-dataset.com/benchmarks/#scene-labeling-task)
 * 目前最好 Class IoU：83.6，之前跑过的DeepLabv3+为82.1。
 * CityScapes 用IoU作为评价指标，这都是语义分割的评价指标，应该是数据集有多个类别，这样评价比较合理
 

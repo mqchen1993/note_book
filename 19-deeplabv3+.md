@@ -70,7 +70,7 @@
 
 ### DeepLabv3+使用Modified Aligned Xception(BackBone),对Xception的改进如下:
 
-![](https://github.com/kinglintianxia/note_book/blob/master/imgs/Modified Aligned Xception.png)
+![](https://github.com/kinglintianxia/note_book/blob/master/imgs/Modified_Aligned_Xception.png)
 
 * 层数变深了.
 * 所有的`最大池化`都被`替换`成了`3x3 with stride 2` 的 Separable `Convolution`.
@@ -361,6 +361,8 @@ $ python train.py --logtostderr --training_number_of_steps=30000 --train_split="
 # global step 30000: loss = 0.2861 (0.878 sec/step), miou_1.0[0.826865256]
 $ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=513 --train_crop_size=513 --train_batch_size=8 --dataset="pascal_voc_seg" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_pascal_trainval/model.ckpt --train_logdir=./datasets/pascal_voc_seg/exp/train_on_train_set/train --dataset_dir=./datasets/pascal_voc_seg/tfrecord --num_clones=2 --fine_tune_batch_norm=False --initialize_last_layer=False --last_layers_contain_logits_only=False
 
+---------------------------------------------------
+# mobilenet_v2 on VOC dataset performance(val): 75.32% (OS=16), 77.33 (OS=8)
 # 2019.03.15
 ## mobilenet_v2, `re-use all the trained weights except the logits` [OK]
 ## global step 8890: loss = 0.3322 (0.205 sec/step), miou_1.0[0.706052244]
@@ -419,7 +421,7 @@ $ python eval.py --logtostderr --eval_split="val" --model_variant="xception_65" 
 ------------------------
 ## run eval, mobilenet_v2
 $ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --output_stride=16 --eval_crop_size=1025 --eval_crop_size=2049 --dataset="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1
-
+### ASPP & Decoder
 $ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --eval_crop_size=1025 --eval_crop_size=2049 --dataset="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1
 
 ## Get 'Waiting for new checkpoint at...' 
@@ -438,7 +440,11 @@ $ tensorboard --logdir ./
 $ python vis.py --logtostderr --vis_split="val" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --vis_crop_size=1025 --vis_crop_size=2049 --dataset="cityscapes" --colormap_type="cityscapes" --checkpoint_dir=./datasets/model_zoo/deeplabv3_cityscapes_train --vis_logdir=./datasets/cityscapes/exp/train_on_train_set/vis --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1
 
 # run vis, mobilenet_v2
+$ python vis.py --logtostderr --vis_split="val" --model_variant="mobilenet_v2"  --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=8  --decoder_output_stride=4 --vis_crop_size=1025 --vis_crop_size=2049 --dataset="cityscapes" --colormap_type="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/mobilenet_v2-backbone-aspp-decoder --vis_logdir=./datasets/cityscapes/exp/train_on_train_set/vis --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1
+
+# run vis, mobilenet_v2
 $ python vis.py --logtostderr --vis_split="val" --model_variant="mobilenet_v2"  --output_stride=16  --vis_crop_size=1025 --vis_crop_size=2049 --dataset="cityscapes" --colormap_type="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train --vis_logdir=./datasets/cityscapes/exp/train_on_train_set/vis --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1
+
 ## Get output file: 'datasets/cityscapes/exp/train_on_train_set/vis/segmentation_results'
 ```
 
@@ -462,7 +468,7 @@ $ python train.py --logtostderr --training_number_of_steps=10000 --train_split="
 ## Training with Batch norm is essential to attain high performance.
 
 # 2019.03.18           
-## Fine-tuning  `re-use only the network backbone`
+## Fine-tuning  `re-use only the network backbone`		[0.72 VS 0.80]
 ## global step 11550: loss = 0.3878 (0.594 sec/step), miou_1.0[0.542078793]
 ## step 90000: loss = 0.4648 (0.570 sec/step), miou_1.0[0.718897283], miou_1.0[0.722017109](OS=8)      
 $ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="xception_65" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=2 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/xception_65/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=False --initialize_last_layer=False --last_layers_contain_logits_only=False
@@ -488,7 +494,7 @@ $ python train.py --logtostderr --training_number_of_steps=10000 --train_split="
 ## Recording summary at step 13278, loss = 0.2239 (0.881 sec/step), miou_1.0[0.668720305]
 ## Recording summary at step 20000, loss = 0.2694 (0.868 sec/step), miou_1.0[0.671730518]
 ## global step 43850: loss = 0.1665 (0.934 sec/step), miou_1.0[0.704537928]
-## global step 90000: loss = 0.1702 (0.831 sec/step), miou_1.0[0.706493258], miou_1.0[0.687527776](OS=16)
+## global step 90000: loss = 0.1702 (0.831 sec/step), miou_1.0[0.706493258](-1.0%), miou_1.0[0.687527776](OS=16, -1.9%)
 $ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=8 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=False --initialize_last_layer=False --last_layers_contain_logits_only=True --save_summaries_images=True
 
 
@@ -501,12 +507,101 @@ $ python train.py --logtostderr --training_number_of_steps=30000 --train_split="
 
 ----------------
 # 2019.03.19
-## mobilenet_v2, `re-use only the network backbone`
+## mobilenet_v2, `re-use only the network backbone`	[Failed], '0.588809609' VS '0.706700146'
 ## train_batch_size=16, fine_tune_batch_norm=True
-## Training will be done at 21:00
 ## global step 7640: loss = 0.6005 (0.390 sec/step), miou_1.0[0.307944208]
-## 
-$ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=16 --train_crop_size=769 --train_crop_size=769 --train_batch_size=16 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True
+## global step 28800: loss = 0.3123 (1.062 sec/step), miou_1.0[0.428906143]
+## global step 65738, miou_1.0[0.581575751]
+## global step 90000: loss = 0.3171 (1.109 sec/step), miou_1.0[0.588809609], miou_1.0[0.597531855](OS=8)
+## `base_learning_rate` too small ? YEAH !!!
+$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=16 --train_crop_size=769 --train_crop_size=769 --train_batch_size=16 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True
+
+----------------
+# 2019.03.20
+## mobilenet_v2, `re-use only the network backbone`		[OK]
+## train_batch_size=16, fine_tune_batch_norm=True, base_learning_rate=0.001
+## global step 10440: loss = 0.2543 (0.965 sec/step), miou_1.0[0.684512675]
+## global step 60000: loss = 0.2023, miou_1.0[0.699472129](-0.7%), miou_1.0[0.708855033](OS=8,-0.76%)
+## global step 69490: loss = 0.1956, miou_1.0[0.699715734](-0.698%), miou_1.0[0.709764659](OS=8,-0.669%)
+## global step 72490: loss = 0.1723, miou_1.0[0.701163888](-0.553%), miou_1.0[0.711194](OS=8, -0.534%)
+## global step 90000: loss = 0.2030, miou_1.0[0.701635838](-0.506%), miou_1.0[0.711272776](OS=8, -0.526%) 
+$ python train.py --logtostderr --training_number_of_steps=60000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=16 --train_crop_size=769 --train_crop_size=769 --train_batch_size=16 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.001
+
+----------------
+# 2019.03.21
+## mobilenet_v2, `re-use only the network backbone` 	
+## atrous_rates, decoder_output_stride=4, train_batch_size=8, 
+## fine_tune_batch_norm=False, base_learning_rate=0.001,
+## With `ASPP` & `Decoder`.
+## global step 60000: loss = 0.2365 (0.624 sec/step), 
+## OS=16, miou_1.0[0.713084042], class_0_iou[0.977024138], class_1_iou[0.819241762], class_2_iou[0.909438729], class_3_iou[0.47108227], class_4_iou[0.557567596], class_5_iou[0.526857793], class_6_iou[0.605363429], class_7_iou[0.704800606], class_8_iou[0.912902653], class_9_iou[0.604719758], class_10_iou[0.93508476], class_11_iou[0.759098768], class_12_iou[0.501966774], class_13_iou[0.931289], class_14_iou[0.662572622], class_15_iou[0.784451902], class_16_iou[0.65018934], class_17_iou[0.514163], class_18_iou[0.720781744]
+
+## OS=8, miou_1.0[0.718111694], class_0_iou[0.976072133],class_1_iou[0.81612581],class_2_iou[0.910968959], class_3_iou[0.474383414], class_4_iou[0.555778503], class_5_iou[0.551861942], class_6_iou[0.616956949], class_7_iou[0.718308449], class_8_iou[0.91384697], class_9_iou[0.605608463], class_10_iou[0.936656296], class_11_iou[0.768783], class_12_iou[0.513123572], class_13_iou[0.932872117], class_14_iou[0.662885666], class_15_iou[0.784798861], class_16_iou[0.651456356], class_17_iou[0.526634455], class_18_iou[0.727000773]
+
+## global step 90000: loss = 0.2403, miou_1.0[0.715924084], miou_1.0[0.721019745](OS=8)
+$ python train.py --logtostderr --training_number_of_steps=60000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=False --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.001
+
+
+-----------------
+## Cityscapes dataset train class ID
+[128, 64, 128],  # trainId 0: 'road'			[0.977024138]		+
+[244, 35, 232],  # trainId 1: 'sidewalk'		[0.819241762]		+
+[70, 70, 70],    # trainId 2: 'building'		[0.909438729]		
+[102, 102, 156], # trainId 3: 'wall'			[0.47108227]
+[190, 153, 153], # trainId 4: 'fence'			[0.557567596]
+[153, 153, 153], # trainId 5: 'pole'			[0.526857793]
+[250, 170, 30],  # trainId 6: 'traffic light'	[0.605363429]		+
+[220, 220, 0],   # trainId 7: 'traffic sign'	[0.704800606]		+
+[107, 142, 35],  # trainId 8: 'vegetation'		[0.912902653]		+
+[152, 251, 152], # trainId 9: 'terrain'			[0.604719758]		
+[70, 130, 180],  # trainId 10: 'sky'			[0.93508476]		
+[220, 20, 60],   # trainId 11: 'person'			[0.759098768]		+
+[255, 0, 0],     # trainId 12: 'rider'			[0.501966774]		+
+[0, 0, 142],     # trainId 13: 'car'			[0.931289]			+
+[0, 0, 70],      # trainId 14: 'truck'			[0.662572622]		+
+[0, 60, 100],    # trainId 15: 'bus'			[0.784451902]		+
+[0, 80, 100],    # trainId 16: 'train'			[0.651456356]
+[0, 0, 230],     # trainId 17: 'motorcycle'		[0.514163]			
+[119, 11, 32],   # trainId 18: 'bicycle'		[0.720781744]		+
+
+------------------
+# 2019.03.22
+## mobilenet_v2, `re-use only the network backbone` 	[OK]
+## train_batch_size=8, fine_tune_batch_norm=False, base_learning_rate=0.001,
+## global step 60000: loss = 0.1840 (0.454 sec/step), miou_1.0[0.703004062], miou_1.0[0.71064](OS=8)
+## global step 80100: loss = 0.1852 (0.482 sec/step), miou_1.0[0.699271679]
+## global step 90000: loss = 0.1706 (0.452 sec/step), miou_1.0[0.702552319], miou_1.0[0.710787654](OS=8) 
+$ python train.py --logtostderr --training_number_of_steps=60000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=16 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=False --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.001
+
+
+
+----------------
+# 2019.03.23
+## mobilenet_v2, `re-use only the network backbone` 	
+## atrous_rates, decoder_output_stride=4, train_batch_size=8, 
+## fine_tune_batch_norm=False, base_learning_rate=0.001,
+## With `ASPP` & `Decoder`, `Multi loss`
+## global step 10930: loss = 0.2160 (0.647 sec/step), miou_1.0[0.658394158]
+## global step 30000: loss = 0.2130, miou_1.0[0.690611124], miou_1.0[0.698419273](OS=8)
+## global step 39220: loss = 0.2180, miou_1.0[0.692829728], miou_1.0[0.699058115](OS=8)
+## global step 90000: loss = 0.2137, miou_1.0[0.712212205], miou_1.0[0.716619968](OS=8) 
+$ python train.py --logtostderr --training_number_of_steps=60000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=False --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.001
+
+
+
+----------------
+# 2019.03.24
+## mobilenet_v2, `re-use only the network backbone` 	
+## atrous_rates, decoder_output_stride=4, train_batch_size=8, 
+## fine_tune_batch_norm=False, base_learning_rate=0.001,
+## With `ASPP` & `Decoder`, `Updated Multi loss`
+## global step 53430: loss = 0.2190 (0.702 sec/step), miou_1.0[0.70634681], miou_1.0[0.708874226](OS=8)
+## global step 57660: loss = 0.2031, miou_1.0[0.710215807], miou_1.0[0.712354183](OS=8)
+## --base_learning_rate=0.0001
+## global step 60000: loss = 0.2219, miou_1.0[0.710162222], miou_1.0[0.712677181](OS=8)
+## global step 90000: loss = 0.2795, miou_1.0[0.711302519], miou_1.0[0.714012325](OS=8)
+$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=False --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.001
+
 
 
 
@@ -862,15 +957,49 @@ solution: adding the `--decoder_output_stride=4 flag`
 * Issues: Is it possible to get `94% mIOU` of pascal voc 'val' data?
 Ans: You are training with `trainval` dataset which means you've already include the `val set` during `training`. That usually results in `overfitting` in val dataset with `mIoU over 90%`.
 
-* To get the 82.1% performance (on test set), you need to further train the model on all the `fine + coarse` annotations.
 
-* deeplabv3+ how to print `per_class_iou`?
+* `deeplabv3+` how to print `per_class_iou`?
 1. [TensorFlow: How Can I get the total_cm in tf.contrib.metrics.streaming_mean_iou](https://stackoverflow.com/questions/40340728/tensorflow-how-can-i-get-the-total-cm-in-tf-contrib-metrics-streaming-mean-iou)
 
 2. [Deeplab——How to evaluate each class of iou](https://blog.csdn.net/zsf442553199/article/details/82217717)
 
-* From the code 'model/research/deeplab/train.py#L101'
-When `fine_tune_batch_norm=True`, use `at least batch size larger than 12` (batch size more than 16 is better). Otherwise, one could use smaller batch size and set fine_tune_batch_norm=False.
+
+* I have trained deeplab on my custom dataset(`VOC like`). The `training works without any problem`.
+```shell
+python train.py
+--logtostderr
+--training_number_of_steps=30000
+--train_split="train"
+--model_variant="mobilenet_v2"
+--atrous_rates=12
+--atrous_rates=24
+--atrous_rates=36
+--output_stride=8
+--decoder_output_stride=4
+--train_crop_size=241
+--train_crop_size=321
+--train_batch_size=24
+--dataset="${DATASET}"
+--initialize_last_layer=false 
+```
+
+# Update 2019.03.20
+## [deeplab/g3doc/cityscapes.md](https://github.com/tensorflow/models/blob/master/research/deeplab/g3doc/cityscapes.md)
+* Note that for `{train,eval,vis}.py`:
+
+1. In order to `reproduce our results`, one needs to use large `batch size (> 8)`, and set `fine_tune_batch_norm = True`. Here, we simply use small batch size during training for the purpose of demonstration. If the users have `limited GPU memory` at hand, please fine-tune from our provided checkpoints whose batch norm parameters have been trained, and `use smaller learning rate` with `fine_tune_batch_norm = False`.
+
+2. The users should change `atrous_rates` from [6, 12, 18] to [12, 24, 36] if setting `output_stride=8`.
+
+3. The users could skip the flag, `decoder_output_stride`, if you do not want to use the decoder structure.
+
+4. Change and add the following flags in order to use the provided `dense prediction cell`. Note we need to set `decoder_output_stride` if you want to use the provided checkpoints which include the decoder module.
+```python
+--model_variant="xception_71"
+--dense_prediction_cell_json="deeplab/core/dense_prediction_cell_branch5_top1_cityscapes.json"
+--decoder_output_stride=4
+```
+
 
 -----------------------------------
 # 2019.03.16
@@ -883,29 +1012,93 @@ When `fine_tune_batch_norm=True`, use `at least batch size larger than 12` (batc
 ---------------------------------------
 # 2019.03.18
 ## MobileNetV2
-- [ ] **DeepLab Code Reading**
-* `deeplab_demo.ipynb`
+- [x] **DeepLab Code Reading**
+## `deeplab_demo.ipynb`
 Done!
 
 
 ---------------------------------------
 # 2019.03.19
-* `train.py`
+## `train.py`
+`train.py/_build_deeplab()/multi_scale_logits()` -> `model.py/_get_logits()/extract_features()` -> `core/feature_extractor.py` 
+
+* From the code 'model/research/deeplab/train.py#L101'
+> When `fine_tune_batch_norm=True`, use `at least batch size larger than 12` (batch size more than 16 is better). Otherwise, one could use smaller batch size and set fine_tune_batch_norm=False. <br>
+
+* From the code 'model/research/deeplab/common.py#L47'
+```python
+"""
+When using 'mobilent_v2', we set `atrous_rates = decoder_output_stride = None`.
+When using 'xception_65' or 'resnet_v1' model variants, we set
+atrous_rates = [6, 12, 18] (output stride 16) and decoder_output_stride = 4.
+"""
+```
+
+* From the code 'model/research/deeplab/utils/train_utils.py#L56'
+'upsample_logits', True
+> `Label` is not downsampled, and instead we `upsample logits`.
+
+* Image and label preprocess:
+In 'deeplab/input_preprocess.py/preprocess_image_and_label()'
+```python
+# image & label type.
+processed_image = tf.cast(image, tf.float32)
+label = tf.cast(label, tf.int32)
+```
+
+* Data augmentation
+In 'deeplab/input_preprocess.py/preprocess_image_and_label()'
+1. random_scale
+[0.5, 2.0], step:0.25
+
+2. Pad image with mean pixel value.
+For 'mobilenet_v2', mean_pixel: [127.5, 127.5, 127.5] <br>
+target_height: [crop_height, 2*origin_height]
+
+3. Randomly crop the image and label.
+For Cityscapes: crop_size: [769, 769]
+
+4. Randomly left-right flip the image and label.
+> _PROB_OF_FLIP = 0.5
+
+* `Default setup` for 'mobilenet_v2':
+> No `ASPP` and No `Decoder`.
 
 
+----------------------------------------
+# 2019.03.21
+## Code Reading
+- [x] **eval.py**
+`eval.py/predict_labels()` -> `model.py`
+* add `per-class IoU`.
+
+* `logits`: decoder_output_stride (resize到) label.shape(resize_bilinear) -> `tf.metrics.mean_iou` with logits.
+
+----------------
+- [x] **vis.py**
+`vis.py/predict_labels()` -> `model.py` get `predictions` -> `vis.py/_process_batch()`
+
+* set `also_save_raw_predictions` to raw predictions(evaluation id)
 
 
+----------------------------------------
+# 2019.03.21
+- [x] add `sigmoid_cross_entropy` in `deeplab/utils/train_utils.py`
+
+In `train.py#L239`
+> train_utils.add_softmax_cross_entropy_loss_for_each_scale( 
 
 
+--------------------
+- [x] **add `multi_loss` seg map**
 
+* `deeplab/utils/train_utils.py/add_softmax_cross_entropy_for_auxiliary_loss()`
 
+* `deeplab/model.py#L523`
+loss_weight=0.4
 
-
-
-
-
-
-
+* `deeplab/train.py`
+loss_weight=0.6
 
 
 
