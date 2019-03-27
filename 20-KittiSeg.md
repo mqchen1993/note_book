@@ -20,6 +20,7 @@ $ python evaluate.py
 # [CityScapes benchmark](https://www.cityscapes-dataset.com/benchmarks/#scene-labeling-task)
 * 目前最好 Class IoU：83.6，之前跑过的DeepLabv3+为82.1。
 * CityScapes 用IoU作为评价指标，这都是语义分割的评价指标，应该是数据集有多个类别，这样评价比较合理
+* FCN-8s: 65.3
 
 # VOC2012 benchmark（http://host.robots.ox.ac.uk:8080/leaderboard/displaylb.php?challengeid=11&compid=6#KEY_FCN-8s）
 * 目前最好 DeepLabv3+_JFT	mIoU: 89.0, DeepLabv3+ 为87.8， 	原生FCN-8s（模型结构同KittiSeg）mIoU：62.2.
