@@ -228,7 +228,7 @@ class CAM_Module(Module):
 * why add "energy_new = torch.max(energy, -1, keepdim=True)[0].expand_as(energy)-energy" <br>
 Ans: Prevent loss divergence during training(防止训练期间的损失不收敛)
 
-* [I want to apply danet module to deeplab](https://github.com/junfu1115/DANet/issues/28)
+* [I want to apply danet module to deeplab](https://github.com/junfu1115/DANet/issues/28) <br>
 Que: I want to apply danet module to deeplab, so i am not sure how to insert it, wheater the front/middle/end of backbone(xception),or before ASPP module and behind ASPP, can you help me? <br>
 
 Ans: Y can apply danet module at the end of backbone. If u want to use both aspp and danet, u can try to apply danet `before or behind aspp`, since we dont try aspp in our network, i can not give u a clear answer.
@@ -272,6 +272,7 @@ return x
 * `encoding/models/danet.py/DANetHead()` <br>
 ```python
 # Attention module `in_channels=2018`, `out_channels=num_classes`
+        
 class DANetHead(nn.Module):
     """
     in_channels: 2048
@@ -303,24 +304,25 @@ class DANetHead(nn.Module):
         self.conv8 = nn.Sequential(nn.Dropout2d(0.1, False), nn.Conv2d(512, out_channels, 1))
 
     def forward(self, x):
-        feat1 = self.conv5a(x)
-        sa_feat = self.sa(feat1)
-        sa_conv = self.conv51(sa_feat)
-        sa_output = self.conv6(sa_conv)
+        feat1 = self.conv5a(x)                  # 3x3 conv, in_channels // 4 = 512
+        sa_feat = self.sa(feat1)                # position attention, in_channels // 4 = 512
+        sa_conv = self.conv51(sa_feat)          # 3x3 conv, in_channels // 4 = 512
+        sa_output = self.conv6(sa_conv)         # 1x1 conv, num_classes
 
-        feat2 = self.conv5c(x)
-        sc_feat = self.sc(feat2)
-        sc_conv = self.conv52(sc_feat)
-        sc_output = self.conv7(sc_conv)
+        feat2 = self.conv5c(x)                  # 3x3 conv, in_channels // 4 = 512
+        sc_feat = self.sc(feat2)                # channel attention, in_channels // 4 = 512
+        sc_conv = self.conv52(sc_feat)          # 3x3 conv, in_channels // 4 = 512
+        sc_output = self.conv7(sc_conv)         # 1x1 conv, num_classes
 
-        feat_sum = sa_conv+sc_conv
+        feat_sum = sa_conv+sc_conv              # self-attention merge, in_channels // 4 = 512
         
-        sasc_output = self.conv8(feat_sum)
+        sasc_output = self.conv8(feat_sum)      # self-attention out, 1x1 conv, num_classes
 
         output = [sasc_output]
         output.append(sa_output)
         output.append(sc_output)
         return tuple(output)
+
 ```
 
 * DANet 网络结构

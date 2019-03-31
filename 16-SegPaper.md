@@ -113,7 +113,7 @@ $$ AP = \int_0^1 {p(r)} dr $$
 * `In theory`, our models could learn to carefully write to unevenly overlapping positions so that the output is evenly balanced; `In fact`, not only do models with uneven overlap not learn to avoid this, but models with even overlap often learn kernels that cause similar artifacts! 
 * `Better Upsampling`
 > 1. `One approach` is to make sure you use `a kernel size that is divided by your stride`, avoiding the overlap issue.
-> 2. Another approach is to `separate out` `upsampling` to a higher resolution from `convolution` to compute features. For example: `resize the image (using nearest-neighbor interpolation or bilinear interpolation) and then do a convolutional layer`.
+> 2. Another approach is to `separate out` `upsampling` to a higher resolution from `convolution` to compute features. For example: `resize the image (using [nearest-neighbor interpolation](https://en.wikipedia.org/wiki/Nearest-neighbor_interpolation) or [bilinear interpolation](https://en.wikipedia.org/wiki/Bilinear_interpolation)) and then do a convolutional layer`.
 
 ![](https://distill.pub/2016/deconv-checkerboard/assets/upsample_DeconvTypes.svg)
 
@@ -1636,8 +1636,10 @@ see `19-deeplabv3+.md`
 
 -------------------------
 # 2019.03.23
-- [x] **ASPP 仿照 PSPNet `Concat` 原feature map**
+- [x] **改进ASPP**
+ASPP 仿照 PSPNet `Concat` 原feature map <br>
 `deeplab/model.py#L441`
+
 
 - [x] **add `multi_loss` seg map**
 see `19-deeplabv3+.md`
@@ -1655,48 +1657,141 @@ see `19-deeplabv3+.md`
 
 --------------
 # 2019.03.25
-- [ ] **Train `dense_prediction_cell`**
+- [x] **Train `dense_prediction_cell`**
+
 
 
 --------------
+# 2019.03.26
+- [x] **self-attention**
+see `19-deeplabv3+.md`
+
+--------------
+# 2019.03.26
+- [x] **better decoder**
+see `19-deeplabv3+.md`
+
+--------------
+# 2019.03.28
+- [x] **kitti road dataset**
+see `19-deeplabv3+.md`
+
+
+
+
+--------------
+# Update 2019.03.28
+- [x] **Training cityscapes coarse dataset**
+* `gt_Coarse` 生成的`*_gtCoarse_labelTrainIds.png`只有黑白两色?
+暂时放置
+* 视觉错误，脚本没错。
+
+
+
+
+
+--------------
+# 2019.03.29
+- [x] **计算网络 Params & Multiply-Adds**
+
+* [tensorflow统计网络参数量](https://blog.csdn.net/feynman233/article/details/79187304)
+```python
+# print model total params.
+def show_params():
+  total = 0
+  for v in tf.trainable_variables():
+    dims = v.get_shape().as_list()
+    num  = int(np.prod(dims))
+    total += num
+    print('  %s \t\t Num: %d \t\t Shape %s ' % (v.name, num, dims))
+  print('\nTotal number of params: %d' % total)
+
+# Modify `eval.py`
+```
+
+* [How to count Multiply-Adds operations?](https://stackoverflow.com/questions/51077386/how-to-count-multiply-adds-operations)
+
+* [how to calculate the flops from tfprof in tensorflow?](https://stackoverflow.com/questions/47387561/how-to-calculate-the-flops-from-tfprof-in-tensorflow/50680858#50680858) <br>
+
+Ques: how could one get the exact number of FLOP disregarding the initialisation FLOP? <br>
+
+Answer: Freeze the graph with a `pb`
+
+## Multiply-Adds
+* [GFLOPS百度百科](https://baike.baidu.com/item/GFLOPS/989595?fr=aladdin)
+* GFLOPS 就是 Giga Floating-point Operations Per Second,即每秒10亿次的浮点运算数
+* GFLOPS = Multiply-Adds(Billion)
+* [](https://stackoverflow.com/questions/50288523/what-is-flops-calculated-by-tensorflow-tf-profile) <br>
+their calculation only considers `multiply and add operations`. Whereas `tensorflow` further includes `batch norm or max operations of pooling, relu`. I think that is the reason for the difference.
+
+* Code in `deeplab_demo_me.ipynb`.
+
+
+
+
+----------------
+# 2019.03.29
+- [x] **frozen graph**
+```shell
+$ python export_model.py --logtostderr --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --crop_size=1025 --crop_size=2049 --checkpoint_path=./datasets/cityscapes/exp/train_on_train_set/0328-backbone-aspp-decoder-bn-self_attentionv3/model.ckpt-90000 --export_path=./datasets/cityscapes/frozen_graph.pb --num_classes=19 --use_self_attention=True
+```
+
+---------------------------
+- [x] **Better Upsampling**
+see `19-deeplabv3+.md`
+
+
+----------------
+- [x] **prepare airplane lane dataset**
+
+
+---------------------------
+# 2019.03.30
+- [x] **infer script on frozen graph**
+* `infer.py`
+
+- [x] **draw Cityscapes label colormap**
+* `draw_citysacpes_colormap.py`
+
+
+---------------------------------------------
+# 2019.03.31
+- [ ] **submit cityscapes & kitti**
+
+## Cityscapes Submission.
+* It is well-known that the global IoU measure is biased toward object instances that cover a large image area.
+* [Create Submission](https://www.cityscapes-dataset.com/create-submission/)
+----------------
+### Requirements
+* single zip archive
+* maximum 100 MB
+* Result files with filename "berlin_000123_000019*.ext" where `ext` is `png` for pixel-level and `txt` for instance-level semantic labeling. The files can be in arbitrary sub folders.
+* Exactly one result file for each test image
+* Result image size must be equal to the input image size, i.e. 2048 x 1024 pixels
+* Labels must be encoded by labelIDs, not trainIDs, e.g. a car should have ID 26
+
+
+
+* code submit script.
+
+
+
+## Kitti Road Submission.
 
 
 # ==TODO==
 
---------------
-- [ ] **decoder_output_stride=1**
+- [ ] **train fine+coarse**
+
+
+
+
+
+
 
 
 
 --------------
-- [ ] **self-attention**
-
-
-
----------------------------
-- [ ] **Better Upsampling**
-```python
-tf.image.resize_images(
-    images,
-    size,
-    method=ResizeMethod.BILINEAR,		# ResizeMethod.NEAREST_NEIGHBOR
-    align_corners=False,
-    preserve_aspect_ratio=False
-)
-
-# 
-tf.image.resize_nearest_neighbor(
-    images,
-    size,
-    align_corners=False,
-    name=None
-)
-# Resize images to size using nearest neighbor interpolation.
-
-```
-
---------------
-- [ ] **计算网络 Params & Multiply-Adds**
 - [ ] **输入Image手工添加其他特征channels，比如Canny,Gray,hsv, self-attention等**
 
 
@@ -1704,10 +1799,7 @@ tf.image.resize_nearest_neighbor(
 - [ ] **搞清`atrous convolution` code实现**
 
 
---------------
-- [ ] **Training cityscapes coarse dataset**
-* `gt_Coarse` 生成的`*_gtCoarse_labelTrainIds.png`只有黑白两色?
-暂时放置
+
 
 
 - [ ] **+ DANet**

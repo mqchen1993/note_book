@@ -85,9 +85,22 @@ $ python train.py --hypes hypes/multinet2.json
 $ python cityscapesScripts/cityscapesscripts/evaluation/evalPixelLevelSemanticLabeling.py
 ```
 
-
-# Coarse dataset 
+# 6. Prepare `fine+coarse` data
+## Coarse dataset 
 * 'gt_Coarse/train_extra': 19998 files.
 * fine + coarse: 24998
-* `gt_Coarse` 生成的`*_gtCoarse_labelTrainIds.png`只有黑白两色?
+* `gt_Coarse` 生成的`*_gtCoarse_labelTrainIds.png`只有黑白两色? 视觉错误。
+
+1. 修改`createTrainIdLabelImgs.py`只保留`searchCoarse` data.
+$ python cityscapesScripts/cityscapesscripts/preparation/createTrainIdLabelImgs.py 
+2. 将`leftImg8bit`文件夹下`train_extra` copy 合并为`fine+coarse`; 将`gtFine`文件夹下`train_extra` copy 合并为`fine+coarse`;
+3. 运行转换脚本
+$ ./convert_cityscapes_fine_coarse.sh
+
+
+
+
+
+
+
 
