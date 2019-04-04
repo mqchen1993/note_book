@@ -117,6 +117,50 @@ poly,初始学习率乘以$(1-\frac{iter}{maxiter})^{power}$, where power=0.9,Lr
 poly,初始学习率乘以$(1-\frac{iter}{maxiter})^{power}$, where power=0.9,The batch.
 
 
+------------------------------------------------------
+# 2019.03.13
+## PSPNet
+
+- [x] **Paper Reading**
+### PSPNet网络结构
+
+![](https://github.com/kinglintianxia/note_book/blob/master/imgs/PSPNet.png)
+
+* Our `pyramid pooling module` is a four-level one with bin sizes of `1×1, 2×2, 3×3 and 6×6` respectively. 
+* `Average pooling` works `better` than max pooling in all settings.
+* we use `1×1 convolution` layer after `each pyramid level` to reduce the dimension of context representation to `1/N` of the original one if the level size of `pyramid is N`. 
+* we use the `"poly"` learning rate policy,  Momentum and weight decay are set to `0.9` and `0.0001` respectively.
+* we set the `“batchsize” to 16` during training.
+* [PSPNet-Pyramid Scene Parsing Network-金字塔场景解析网络](https://blog.csdn.net/jiang1943/article/details/83544326)
+
+### Implementation Details:
+|	参数 	|		设置	 		|
+|	------	|		------		|
+|平台 		|		Caffe		|
+|学习率 		|采用“poly”策略，即lr=lrbase∗(1−itermaxiter)power,其中lrbase=0.01,power=0.9 momentum=0.9,weightdecay=0.0001	|
+|迭代次数 	|ImageNet上设置150K，PASCAL VOC上设置30K，Cityscapes设置90K|
+|数据增强 	|随机镜像翻转，尺寸在0.5-2之间缩放，角度在-10°和10°之间随机旋转、随机的高斯模糊|
+|batchsize 	|	16				|
+|辅助loss的权重|	weight=0.4		|
+
+### Results on `Cityscapes testing set`:
+
+| Method	|	IoU class	|
+| ------	|	------		|
+| DeepLabv2	|	70.4		|
+| DeepLabv3 |	81.3		|
+| DeepLabv3+|	82.1		|
+| DANet 	|	81.5		|
+| PSPNet	|	81.2		|
+
+
+
+
+### CityScapes dataset
+Cityscapes is a recently released dataset for semantic urban scene understanding. It contains `5,000 high quality pixel-level finely annotated images` collected from 50 cities in different seasons. <br>
+The images are divided into sets with numbers `2,975`, `500`, and `1,525` for `training`, `validation` and `testing`. It defines `19 categories` containing both stuff and objects. Also, `20,000 coarsely annotated` images are provided for two settings in comparison.
+
+
 -------------------------
 ## DeepLabv3+ 
 - [x] **Paper Reading**
@@ -730,18 +774,24 @@ $ python train.py --logtostderr --training_number_of_steps=90000 --train_split="
 ## mobilenet_v2, `re-use only the network backbone`		
 ## train_batch_size=8, fine_tune_batch_norm=True, base_learning_rate=0.01
 ## With `ASPP` & `Decoder` &　`self-attention v3` & `multi-loss`
-## 
+## global step 90000: loss = 0.2089 (0.636 sec/step), miou_1.0[0.754413664]
+## class_0_iou[0.981412649], class_1_iou[0.843762517], class_2_iou[0.915771604], class_3_iou[0.483922452], class_4_iou[0.569931], class_5_iou[0.603033721], class_6_iou[0.649366081], class_7_iou[0.747023284], class_8_iou[0.919835746], class_9_iou[0.610057473], class_10_iou[0.944969416], class_11_iou[0.79259342], class_12_iou[0.570890069], class_13_iou[0.944824457], class_14_iou[0.80445534], class_15_iou[0.855882287], class_16_iou[0.7432549], class_17_iou[0.605549335], class_18_iou[0.747323155]
 $ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train_multi_loss --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.01 --use_self_attention=True 
 
 
 ----------------
-# 2019.03.30
+# 2019.04.01
 ## mobilenet_v2, `re-use only the network backbone`		
 ## train_batch_size=8, fine_tune_batch_norm=True, base_learning_rate=0.01
 ## With `ASPP` & `Decoder` &　`self-attention v3` & `fine_coarse`
 ## 200 epochs, 22973*200/8 = 574325
+## global step 41120: loss = 0.1392 (0.619 sec/step), miou_1.0[0.581652343]
+## global step 352143, miou_1.0[0.734473109]
+## 
+$ python train.py --logtostderr --training_number_of_steps=500000 --train_split="train_extra" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train_fine_coarse --dataset_dir=/media/jun/ubuntu/datasets/CityScapes/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.01 --use_self_attention=True
 
-$ python train.py --logtostderr --training_number_of_steps=500000 --train_split="train_extra" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train_self_attention --dataset_dir=/media/jun/ubuntu/datasets/CityScapes/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.01 --use_self_attention=True
+## eval
+$ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --eval_crop_size=1025 --eval_crop_size=2049 --dataset="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train_fine_coarse --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1 --use_self_attention=True
 
 ```
 
