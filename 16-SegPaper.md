@@ -584,12 +584,12 @@ sum(y^i-yi)^2		|	y0 = 1
 
 -----------------------------------------------------
 ## YOLO
-see `24-yolov3.md`
+see [24-yolov3.md](https://github.com/kinglintianxia/note_book/blob/master/24-yolov3.md)
 
 ------------------------------------------------------
 # 2019.03.06
 ## DANet
-see `22-DANet.md`
+see [22-DANet.md](https://github.com/kinglintianxia/note_book/blob/master/22-DANet.md)
 
 
 
@@ -1137,25 +1137,48 @@ see `19-deeplabv3+.md`
 * then [1x1, 256] ouput.
 
 
-- [ ] **tf.losses.binary_crossentropy**
+---------------
+- [x] **tf.losses.binary_crossentropy**
+```python
 tf.losses.binary_crossentropy(
     y_true,
     y_pred,
     from_logits=False,
     label_smoothing=0
 )
+Args:
+    from_logits: Whether `y_pred` is expected to be a logits tensor. By default,
+      we assume that `y_pred` encodes a probability distribution.
+    label_smoothing: Float in [0, 1]. If > `0` then smooth the labels.
+    reduction: (Optional) Type of `tf.keras.losses.Reduction` to apply to loss.
+      Default value is `SUM_OVER_BATCH_SIZE`.
+    name: Optional name for the op.
+```
+
+* [tf.losses all](https://stackoverflow.com/questions/47034888/how-to-choose-cross-entropy-loss-in-tensorflow)
+
+> `K.binary_crossentropy` is `tf.nn.sigmoid_cross_entropy_with_logits`
+> `K.categorical_crossentropy` is `tf.nn.softmax_cross_entropy_with_logits`
+
+---------------------------
+- [x] **train fine+coarse**
+* +0.8 %
+
+
+
+---------------------------
+# 2019.04.06
+- [x] **prepare cityscapes trainval set**
 
 
 
 
 # ==TODO==
 
-- [ ] **train fine+coarse**
-
-
 
 - [ ] **train camvid**
 
+- [ ] **train trainval set**
 
 
 

@@ -139,7 +139,7 @@ Note that: We adopt `multiple losses` in end of the network for `better training
 
 -------------------
 # Update 2019.03.25
-- [ ] **Code Reading**
+- [x] **Code Reading**
 * `danet/train.py/get_segmentation_model()` -> `encoding/models/danet.py/DANetHead()` -> `encoding/nn/attention.py`
 ```python
 # encoding/models/danet.py/DANetHead()

@@ -81,3 +81,13 @@ $ sudo apt-get install libpng-dev libfreetype6-dev # matplotlib depedencies.
 $ sudo pip install -r requirements.txt
 ```
 
+
+
+------------
+# NVIDIA Jetson AGX Xavier Module
+* [NVIDIA Jetson AGX Xavier Developer Kit](https://www.jetsonhacks.com/2018/09/28/nvidia-jetson-agx-xavier-developer-kit/)
+* [WikiChip: Tegra Xavier](https://en.wikichip.org/wiki/nvidia/tegra/xavier)
+* [slides from a quite wonderful webinar](https://github.com/dusty-nv/jetson-presentations/raw/master/20181004_Jetson_AGX_Xavier_New_Era_Autonomous_Machines.pdf)
+* [NVIDIA Jetson AGX Xavier Delivers 32 TeraOps for New Era of AI in Robotics ](https://devblogs.nvidia.com/nvidia-jetson-agx-xavier-32-teraops-ai-robotics/)
+
+
