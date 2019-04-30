@@ -807,10 +807,29 @@ $ python train.py --logtostderr --training_number_of_steps=90000 --train_split="
 ## mobilenet_v2, `re-use only the network backbone`		
 ## train_batch_size=8, fine_tune_batch_norm=True, base_learning_rate=0.01
 ## With `better-ASPP v2` & `better decoder v2` &　`self-attention v3`
-## 
-## 
+## global step 90000: loss = 0.1922 (0.644 sec/step), miou_1.0[0.751603]
+------------
+# 2019.04.13
+## global step 90000: loss = 0.1768 (0.625 sec/step), miou_1.0[0.749954879]
+------------
+# 2019.04.14
+## miou_1.0[0.748497367]
+------------
+# 2019.04.28, channel//3 & one 3x3 conv & layer_7 & layer_4 	[OK] + 0.02%
+## `better decoder v3`
+## global step 90000: loss = 0.2053 (0.601 sec/step), miou_1.0[0.758039713]
+------------
+# 2019.04.29, channel//3 & one 3x3 conv &  layer_4 	
+## `better decoder v3`
+## global step 90000: loss = 0.1878 (0.544 sec/step), miou_1.0[0.753849864]
+------------
+# 2019.04.29, channel//3 & layer_7 one 3x3 conv & layer_4 two 3x3 conv
+## `better decoder v3.1`
+## global step 90000: loss = 0.1841 (0.628 sec/step), miou_1.0[0.75093025]
 $ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train_better_decoder_v2 --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.01 --use_self_attention=True --add_image_level_feature=False
 
+# eval
+$ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --eval_crop_size=1025 --eval_crop_size=2049 --dataset="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train_better_decoder_v2 --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1 --use_self_attention=True --add_image_level_feature=False
 
 
 ----------------
@@ -899,6 +918,54 @@ $ python train.py --logtostderr --training_number_of_steps=90000 --train_split="
 ## checkout `better_aspp` branch.
 ## global step 90000: loss = 0.1771 (0.619 sec/step), miou_1.0[0.753383636]
 $ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train_better_aspp --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.01 --use_self_attention=True 
+
+
+------------------
+# 2019.04.25
+## mobilenet_v2, `re-use only the network backbone`		[ok] 
+## train_batch_size=8, fine_tune_batch_norm=True, base_learning_rate=0.01
+## With `better-ASPP v2` & `Decoder` &　`self-attention v3` & 'trainval'
+## checkout `better_aspp` branch.
+## global step 90000: loss = 0.2159 (0.619 sec/step), miou_1.0[0.815261543](on val)
+## submit
+$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="trainval" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train_trainval --dataset_dir=/media/jun/ubuntu/datasets/CityScapes/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.01 --use_self_attention=True --add_image_level_feature=False
+
+## submit Cityscapes test.
+### 1. frozen graph
+$ python export_model.py --logtostderr --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --crop_size=1025 --crop_size=2049 --checkpoint_path=./datasets/cityscapes/exp/train_on_train_set/train_trainval/model.ckpt-90000 --export_path=./datasets/cityscapes/frozen_graph_trainval.pb --num_classes=19 --use_self_attention=True --add_image_level_feature=False
+
+### 2. infer_cityscapes_test
+$ python infer_cityscapes_test.py 
+
+### 3. submit
+* zip 'test_labels' dir
+
+
+
+------------------
+# 2019.04.26
+## mobilenet_v2, `re-use only the network backbone`		
+## train_batch_size=8, fine_tune_batch_norm=True, base_learning_rate=0.01
+## With `better-ASPP v2`
+## checkout `better_aspp` branch.
+## miou_1.0[0.725627542]
+$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train_asppv2 --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.01 --add_image_level_feature=False
+
+# eval
+$ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --eval_crop_size=1025 --eval_crop_size=2049 --dataset="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train_asppv2 --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1 --add_image_level_feature=False
+
+
+------------------
+# 2019.04.28
+## mobilenet_v2, `re-use only the network backbone`		
+## train_batch_size=8, fine_tune_batch_norm=True, base_learning_rate=0.01
+## With `decoder`
+## checkout `better_aspp` branch.
+## miou_1.0[0.725627542]
+$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train_asppv2 --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.01 --add_image_level_feature=False
+
+# eval
+$ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --eval_crop_size=1025 --eval_crop_size=2049 --dataset="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train_asppv2 --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1 --add_image_level_feature=False
 
 
 ```

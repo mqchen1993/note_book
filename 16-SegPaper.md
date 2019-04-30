@@ -1107,7 +1107,7 @@ see `19-deeplabv3+.md`
 
 ---------------------------------------------
 # 2019.03.31
-- [ ] **submit cityscapes & kitti**
+- [x] **submit cityscapes & kitti**
 
 ## Cityscapes Submission.
 * It is well-known that the global IoU measure is biased toward object instances that cover a large image area.
@@ -1122,7 +1122,16 @@ see `19-deeplabv3+.md`
 * Labels must be encoded by labelIDs, not trainIDs, e.g. a car should have ID 26
 
 * code submit script.
+--------------
+## submit Cityscapes test.
+### 1. frozen graph
+$ python export_model.py --logtostderr --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --crop_size=1025 --crop_size=2049 --checkpoint_path=./datasets/cityscapes/exp/train_on_train_set/train_trainval/model.ckpt-90000 --export_path=./datasets/cityscapes/frozen_graph_trainval.pb --num_classes=19 --use_self_attention=True --add_image_level_feature=False
 
+### 2. infer_cityscapes_test
+$ python infer_cityscapes_test.py 
+
+### 3. submit
+* zip 'test_labels' dir
 
 
 ## Kitti Road Submission.
