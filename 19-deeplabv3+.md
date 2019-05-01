@@ -968,11 +968,16 @@ $ python train.py --logtostderr --training_number_of_steps=90000 --train_split="
 $ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --eval_crop_size=1025 --eval_crop_size=2049 --dataset="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train_asppv2 --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1 --add_image_level_feature=False
 
 
+
 ```
 
 
 -----------------
 ### 6. CamVid dataset
+* [CamVid](http://mi.eng.cam.ac.uk/research/projects/VideoRec/CamVid/)
+* [Datasets](https://meetshah1995.github.io/semantic-segmentation/deep-learning/pytorch/visdom/2017/06/01/semantic-segmentation-over-the-years.html)
+* [github](https://github.com/alexgkendall/SegNet-Tutorial)
+
 ### Recommended Directory Structure for Training and Evaluation:
 ```shell
 + datasets
@@ -1008,8 +1013,46 @@ _DATASETS_INFORMATION = {
     'ade20k': _ADE20K_INFORMATION,
     'camvid': _CAMVID_INFORMATION,  #camvid示例
 }
-# ==TODO==
+
 # 修改Colormap
+`deeplab/utils/get_dataset_colormap.py`
+1. _CAMVID = 'camvid'
+2. def create_label_colormap(dataset=_PASCAL):
+```python
+elif dataset == _CAMVID:
+	return create_camvid_label_colormap()
+```
+3. def create_camvid_label_colormap():
+4. For vis:
+`vis.py`
+flags.DEFINE_enum('colormap_type', 'pascal', ['pascal', 'cityscapes', 'kitti_road', 'camvid'],
+                  'Visualization colormap type.')
+
+
+# Max number of entries in the colormap for each dataset.
+_DATASET_MAX_ENTRIES = {
+    _ADE20K: 151,
+    _CITYSCAPES: 19,
+    _MAPILLARY_VISTAS: 66,
+    _PASCAL: 256,
+    _KITTIROAD: 2,
+    _CAMVID: 12
+}
+
+## 解决数据(backgroud & road)不平衡问题
+# Handle data balance problem.
+## 'deeplab/utils/train_utils.py'
+# not_ignore_mask: [batch*height*width] float 1-D tensor.
+  not_ignore_mask = tf.to_float(tf.not_equal(scaled_labels,
+                                             ignore_label)) * loss_weight   # loss_weight=1.0
+  # handle label unbalance
+  pole_label = 2
+  pole_weight = 10.0 #background 
+  bk_label = 11
+  bk_weight = 10.0 #object1 
+  not_ignore_mask += tf.to_float(tf.equal(scaled_labels, pole_label)) * pole_weight + \
+                  tf.to_float(tf.equal(scaled_labels, bk_label)) * bk_weight
+
 ```
 
 ------------------
@@ -1054,12 +1097,26 @@ $ python train.py --logtostderr --training_number_of_steps=30000 --train_split="
 
 ------------------
 # 2019.04.11
-## mobilenet_v2, `re-use only the network backbone`		[ok] +0.534%
-## train_batch_size=8, fine_tune_batch_norm=True, base_learning_rate=0.01
-## With `better-ASPP v2` & `Decoder` &　`self-attention v3`
+## mobilenet_v2, `re-use only the network backbone`		[ok] 
+## train_batch_size=16, fine_tune_batch_norm=True, base_learning_rate=0.01
+## With `better-ASPP v2` & `Decoder v2` &　`self-attention v3`
 ## checkout `better_aspp` branch.
-## 
-$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=361 --train_crop_size=361 --train_batch_size=16 --dataset="camvid" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/camvid/exp/train_on_train_set/train_better_aspp --dataset_dir=./datasets/camvid/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.01 --use_self_attention=True --add_image_level_feature=False
+## global step 10000: loss = 0.2830 (0.303 sec/step), miou_1.0[0.689712226]
+## global step 30000: loss = 0.2284 (0.301 sec/step), miou_1.0[0.706662]
+## class_0_iou[0.939076543], class_1_iou[0.867931604], class_2_iou[0.179436326], class_3_iou[0.971837163], class_4_iou[0.892812133], class_5_iou[0.907662868], class_6_iou[0.59111923], class_7_iou[0.656218231], class_8_iou[0.866641819], class_9_iou[0.535721362], class_10_iou[0.804336429], class_11_iou[0.267151237]
+$ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=361 --train_crop_size=481 --train_batch_size=16 --dataset="camvid" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/camvid/exp/train_on_train_set/train_asppv2_decoderv3_samv3 --dataset_dir=./datasets/camvid/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.01 --use_self_attention=True --add_image_level_feature=False
+
+# run eval, From tensorflow/models/research/deeplab
+$ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --eval_crop_size=361 --eval_crop_size=481 --dataset="camvid" --checkpoint_dir=./datasets/camvid/exp/train_on_train_set/train_asppv2_decoderv3_samv3 --eval_logdir=./datasets/camvid/exp/train_on_train_set/eval --dataset_dir=./datasets/camvid/tfrecord --max_number_of_iterations=1 --use_self_attention=True --add_image_level_feature=False
+
+# run vis, From 'deeplabv3_cityscapes_train'
+$ python vis.py --logtostderr --vis_split="val" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --vis_crop_size=361 --vis_crop_size=481 --dataset="camvid" --colormap_type="camvid" --checkpoint_dir=./datasets/camvid/exp/train_on_train_set/train_asppv2_decoderv3_samv3 --vis_logdir=./datasets/camvid/exp/train_on_train_set/vis --dataset_dir=./datasets/camvid/tfrecord --max_number_of_iterations=1 --use_self_attention=True --add_image_level_feature=False
+
+# frozen graph
+$ python export_model.py --logtostderr --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --crop_size=361 --crop_size=481 --checkpoint_path=./datasets/camvid/exp/train_on_train_set/train_asppv2_decoderv3_samv3/model.ckpt-30000 --export_path=./datasets/camvid/frozen_graph.pb --num_classes=12 --use_self_attention=True --add_image_level_feature=False
+
+# infer
+$ python infer.py --frozen_graph=/home/jun/Documents/king/models/research/deeplab/datasets/camvid/frozen_graph.pb --image_dir=/media/jun/ubuntu/datasets/CamVid/leftImg8bit/val/
 
 ``` 
 
@@ -1156,8 +1213,6 @@ not_ignore_mask = tf.to_float(tf.equal(scaled_labels, 0)) * bk_weight + \
                   tf.to_float(tf.equal(scaled_labels, 1)) * road_weight + \
                   tf.to_float(tf.equal(scaled_labels, ignore_label)) * irgore_weight 
 
-
-
 ```
 
 ---------------------
@@ -1203,6 +1258,29 @@ $ python train.py --logtostderr --training_number_of_steps=12000 --train_split="
 ## ASPP & Decoder & self-attention v3 & label balance
 ## miou_1.0[0.960260928], class_0_iou[0.985344708], class_1_iou[0.935177147]
 $ python train.py --logtostderr --training_number_of_steps=12000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=376 --train_crop_size=1243 --train_batch_size=8 --dataset="kitti_road" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/kitti_road/exp/train_on_train_set/train_kitti --dataset_dir=./datasets/kitti_road/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.001 --use_self_attention=True
+
+
+----------------
+# 2019.05.01
+## 'deeplabv3_mnv2_cityscapes_train', `re-use only the network backbone` 
+## atrous_rates & train_batch_size=8 & BN=True & --base_learning_rate=0.001
+## ASPP & Decoderv3 & self-attention v3 
+## global step 12000: loss = 0.1363 (0.430 sec/step), miou_1.0[0.951286614],
+## class_0_iou[0.98259896], class_1_iou[0.919974267]
+$ python train.py --logtostderr --training_number_of_steps=12000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=376 --train_crop_size=1243 --train_batch_size=8 --dataset="kitti_road" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/kitti_road/exp/train_on_train_set/train_final --dataset_dir=./datasets/kitti_road/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.001 --use_self_attention=True
+
+----------------
+# 2019.05.01
+## 'deeplabv3_mnv2_cityscapes_train', `re-use only the network backbone` 
+## atrous_rates & train_batch_size=8 & BN=True & --base_learning_rate=0.001
+## ASPPv2 & Decoderv3 & self-attention v3 & label balance
+## 
+$ python train.py --logtostderr --training_number_of_steps=12000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=376 --train_crop_size=1243 --train_batch_size=8 --dataset="kitti_road" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/kitti_road/exp/train_on_train_set/train_final --dataset_dir=./datasets/kitti_road/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.001 --use_self_attention=True --add_image_level_feature=False
+
+
+# run eval mobilenet_v2
+$ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --eval_crop_size=376 --eval_crop_size=1243 --dataset="kitti_road" --checkpoint_dir=./datasets/kitti_road/exp/train_on_train_set/train_final --eval_logdir=./datasets/kitti_road/exp/train_on_train_set/eval --dataset_dir=./datasets/kitti_road/tfrecord --max_number_of_iterations=1 --use_self_attention=True --add_image_level_feature=False
+
 
 ``` 
 
