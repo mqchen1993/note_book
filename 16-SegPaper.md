@@ -1179,15 +1179,18 @@ Args:
 # 2019.04.06
 - [x] **prepare cityscapes trainval set**
 
+# 2019.05.01
+- [x] **train camvid**
+
+- [x] **train trainval set**
 
 
 
 # ==TODO==
+- [ ] **backbone GFLOPs**
+- [ ] **CamVid test**
+- [ ] **sbumit kitti road**
 
-
-- [ ] **train camvid**
-
-- [ ] **train trainval set**
 
 
 
