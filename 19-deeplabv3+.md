@@ -1018,9 +1018,27 @@ $ python export_model.py --logtostderr --model_variant="mobilenet_v2" --output_s
 ## train_batch_size=8, fine_tune_batch_norm=True, base_learning_rate=0.01
 ## With `self-attention v3` + decoderv2(layer_4, 2 3x3conv)
 ## checkout `master` branch.
-## 
+## Total number of params: 3062467 = 3.06M
+## Avg Inference time: 147.828102112 ms, Avg Infer fps: 6.76461366759.
+## ('FLOPs after freezing: ', 98291662330L) = 98.291 G
+## global step 90000: loss = 0.2336 (0.586 sec/step), miou_1.0[0.743015766] 
 $ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train_samv3_decoderv2 --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.01 --use_self_attention=True
 
+# eval
+$ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --output_stride=16 --decoder_output_stride=4 --eval_crop_size=1025 --eval_crop_size=2049 --dataset="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train_samv3_decoderv2 --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1 --use_self_attention=True
+
+## frozen graph
+$ python export_model.py --logtostderr --model_variant="mobilenet_v2" --output_stride=16 --decoder_output_stride=4 --crop_size=1025 --crop_size=2049 --checkpoint_path=./datasets/cityscapes/exp/train_on_train_set/train_samv3_decoderv2/model.ckpt-90000 --export_path=./datasets/cityscapes/frozen_graph_samv3_decoderv2.pb --num_classes=19 --use_self_attention=True
+
+
+------------------
+# 2019.05.04
+## mobilenet_v2, `re-use only the network backbone`		
+## train_batch_size=8, fine_tune_batch_norm=True, base_learning_rate=0.01
+## With `decoder v2`
+## checkout `master` branch.
+## 
+$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train_decoderv2 --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.01
 
 ```
 
