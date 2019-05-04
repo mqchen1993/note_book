@@ -1168,9 +1168,9 @@ $ python train.py --logtostderr --training_number_of_steps=30000 --train_split="
 
 ------------------
 # 2019.04.30
-## mobilenet_v2, `re-use only the network backbone`		[ok] 
+## mobilenet_v2, `re-use only the network backbone`		[ok]  !!!!!!!!!!!
 ## train_batch_size=16, fine_tune_batch_norm=True, base_learning_rate=0.01
-## With `better-ASPP v2` & `Decoder v2` &　`self-attention v3`
+## With `better-ASPP v2` & `Decoder v3` &　`self-attention v3`
 ## checkout `better_aspp` branch.
 ## global step 10000: loss = 0.2830 (0.303 sec/step), miou_1.0[0.689712226]
 ## global step 30000: loss = 0.2284 (0.301 sec/step), miou_1.0[0.706662]
@@ -1189,6 +1189,13 @@ $ python export_model.py --logtostderr --model_variant="mobilenet_v2" --atrous_r
 # infer
 $ python infer.py --frozen_graph=/home/jun/Documents/king/models/research/deeplab/datasets/camvid/frozen_graph.pb --image_dir=/media/jun/ubuntu/datasets/CamVid/leftImg8bit/val/
 
+# eval on test
+## miou_1.0[0.636239171]
+## 11 classes, 0.665310499
+## class_0_iou[0.906796932], class_1_iou[0.815369785], class_2_iou[0.26212734], class_3_iou[0.954264045], class_4_iou[0.831856072], class_5_iou[0.74824214], class_6_iou[0.462246746], class_7_iou[0.381279051], class_8_iou[0.879858911], class_9_iou[0.495665848], class_10_iou[0.580708623], class_11_iou[0.31645453]
+$ python eval.py --logtostderr --eval_split="test" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --eval_crop_size=361 --eval_crop_size=481 --dataset="camvid" --checkpoint_dir=./datasets/camvid/exp/train_on_train_set/train_asppv2_decoderv3_samv3 --eval_logdir=./datasets/camvid/exp/train_on_train_set/eval --dataset_dir=./datasets/camvid/tfrecord --max_number_of_iterations=1 --use_self_attention=True --add_image_level_feature=False
+
+
 ------------------
 # 2019.05.01
 ## mobilenet_v2, `re-use only the network backbone`		[ok] 
@@ -1197,6 +1204,20 @@ $ python infer.py --frozen_graph=/home/jun/Documents/king/models/research/deepla
 ## checkout `CamVid` branch.
 ## global step 30000: loss = 0.3892 (0.312 sec/step), miou_1.0[0.700075805]
 $ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=361 --train_crop_size=481 --train_batch_size=16 --dataset="camvid" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/camvid/exp/train_on_train_set/train_final --dataset_dir=./datasets/camvid/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.01 --use_self_attention=True --add_image_level_feature=False
+
+# run eval, From tensorflow/models/research/deeplab
+$ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --eval_crop_size=361 --eval_crop_size=481 --dataset="camvid" --checkpoint_dir=./datasets/camvid/exp/train_on_train_set/train_final --eval_logdir=./datasets/camvid/exp/train_on_train_set/eval --dataset_dir=./datasets/camvid/tfrecord --max_number_of_iterations=1 --use_self_attention=True --add_image_level_feature=False
+
+
+
+------------------
+# 2019.05.04
+## mobilenet_v2, `re-use only the network backbone`		 
+## train_batch_size=16, fine_tune_batch_norm=True, base_learning_rate=0.01
+## With `better-ASPP v2` & `Decoder v2` &　`self-attention v3` & label balance & trainval
+## checkout `CamVid` branch.
+## 
+$ python train.py --logtostderr --training_number_of_steps=30000 --train_split="trainval" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=361 --train_crop_size=481 --train_batch_size=16 --dataset="camvid" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/camvid/exp/train_on_train_set/train_asppv2_decoderv2_samv3_trainval --dataset_dir=./datasets/camvid/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.01 --use_self_attention=True --add_image_level_feature=False
 
 ``` 
 
