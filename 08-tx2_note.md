@@ -82,6 +82,16 @@ $ sudo pip install -r requirements.txt
 ```
 
 
+------------------
+# RTSO-9003
+# 1.[瑞泰新时代Download](http://www.realtimes.cn/jishuzhichi/_xiazaizhongxin_/)
+* Download 'RTSO-9003-BSP驱动包-TX2/TX2i-R28.2.1-2018-9-13'
+* Download 'Linux Driver Package and the Root File System-TX2-R28.2.1-2018-9-12'
+* or from [nvidia](https://developer.nvidia.com/embedded/linux-tegra-r2821)
+> 'Driver Packages'& 'Sample Root Filesystem' 
+# 2.
+
+
 
 ------------
 # NVIDIA Jetson AGX Xavier Module
