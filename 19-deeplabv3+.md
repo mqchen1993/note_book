@@ -1298,10 +1298,9 @@ $ python train.py --logtostderr --training_number_of_steps=30000 --train_split="
 # run eval, From tensorflow/models/research/deeplab
 ## train: miou_1.0[0.843014121]
 ## val: miou_1.0[0.762991667]
-## test: miou_1.0[0.689789832]
+## test: miou_1.0[0.689789832] !!!!!
 ### class_0_iou[0.917099655], class_1_iou[0.84545964], class_2_iou[0.292193145], class_3_iou[0.959282577], class_4_iou[0.855822086], class_5_iou[0.77502948], class_6_iou[0.470910251], class_7_iou[0.429024249], class_8_iou[0.890783429], class_9_iou[0.556546152], class_10_iou[0.595537722]
 $ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --eval_crop_size=361 --eval_crop_size=481 --dataset="camvid" --checkpoint_dir=./datasets/camvid/exp/train_on_train_set/train_11cls --eval_logdir=./datasets/camvid/exp/train_on_train_set/eval --dataset_dir=./datasets/camvid/tfrecord --max_number_of_iterations=1 --use_self_attention=True --add_image_level_feature=False
-
 
 # frozen graph
 $ python export_model.py --logtostderr --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --crop_size=361 --crop_size=481 --checkpoint_path=./datasets/camvid/exp/train_on_train_set/train_11cls/model.ckpt-30000 --export_path=./datasets/camvid/frozen_graph_11cls.pb --num_classes=12 --use_self_attention=True --add_image_level_feature=False
@@ -1312,12 +1311,41 @@ $ python infer.py --frozen_graph=/home/jun/Documents/king/models/research/deepla
 
 ------------------
 # 2019.05.07
-## mobilenet_v2, `re-use only the network backbone`		[ok]
+## mobilenet_v2, `re-use only the network backbone`		
 ## train_batch_size=16, fine_tune_batch_norm=True, base_learning_rate=0.01
 ## With `better-ASPP v2` & `Decoder v3` &　`self-attention v3` & 11 classes && label_balance
 ## checkout `CamVid-11cls` branch.
 ## 
 $ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=361 --train_crop_size=481 --train_batch_size=16 --dataset="camvid" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/camvid/exp/train_on_train_set/train_11cls_lb --dataset_dir=./datasets/camvid/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.01 --use_self_attention=True --add_image_level_feature=False
+
+# run eval, From tensorflow/models/research/deeplab
+## 30000 steps.
+## train: miou_1.0[0.84424454]
+## val: miou_1.0[0.771598637]
+## test: miou_1.0[0.686908185]
+## global step 60000: loss = 0.2224 (0.415 sec/step)  Unnecessary 'label_balance' & 60000 steps !!!!!
+## train: miou_1.0[0.856529593]
+## val: miou_1.0[0.775786]
+## test: miou_1.0[0.686013401]
+$ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --eval_crop_size=361 --eval_crop_size=481 --dataset="camvid" --checkpoint_dir=./datasets/camvid/exp/train_on_train_set/train_11cls_lb --eval_logdir=./datasets/camvid/exp/train_on_train_set/eval --dataset_dir=./datasets/camvid/tfrecord --max_number_of_iterations=1 --use_self_attention=True --add_image_level_feature=False
+
+
+------------------
+# 2019.05.08
+## mobilenet_v2, `re-use only the network backbone`		[ok] 
+## train_batch_size=16, fine_tune_batch_norm=True, base_learning_rate=0.01
+## With `better-ASPP v2` & `Decoder v3` &　`self-attention v3` & 11 classes & trainval & finetune
+## checkout `CamVid-11cls` branch.
+## global step 30000: loss = 0.1585 (0.287 sec/step), 
+$ python train.py --logtostderr --training_number_of_steps=30000 --train_split="trainval" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=361 --train_crop_size=481 --train_batch_size=16 --dataset="camvid" --tf_initial_checkpoint=./datasets/camvid/exp/train_on_train_set/train_11cls/model.ckpt-30000 --train_logdir=./datasets/camvid/exp/train_on_train_set/train_11cls_trainval --dataset_dir=./datasets/camvid/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.01 --use_self_attention=True --add_image_level_feature=False
+
+# run eval, From tensorflow/models/research/deeplab
+## train: miou_1.0[0.851458311]
+## val: miou_1.0[0.877481043]
+## test: miou_1.0[0.682963967]
+### 
+$ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --eval_crop_size=361 --eval_crop_size=481 --dataset="camvid" --checkpoint_dir=./datasets/camvid/exp/train_on_train_set/train_11cls_trainval --eval_logdir=./datasets/camvid/exp/train_on_train_set/eval --dataset_dir=./datasets/camvid/tfrecord --max_number_of_iterations=1 --use_self_attention=True --add_image_level_feature=False
+
 
 
 ## finetune from Cityscapes
