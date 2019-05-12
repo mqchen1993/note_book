@@ -587,6 +587,7 @@ $ python train.py --logtostderr --training_number_of_steps=90000 --train_split="
 ## mobilenet_v2, `re-use all the trained wieghts`, set `initialize_last_layer=True` [OK]
 ## Total number of params: 2194963 = 2.195M
 ## ('GFLOPs after freezing: ', 13.8740999319)
+## Inference time: 158.313918114 ms
 $ python train.py --logtostderr --training_number_of_steps=30000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=8 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=False
 
 ----------------
@@ -636,6 +637,9 @@ $ python train.py --logtostderr --training_number_of_steps=90000 --train_split="
 ## global step 72490: loss = 0.1723, miou_1.0[0.701163888](-0.553%), miou_1.0[0.711194](OS=8, -0.534%)
 ## global step 90000: loss = 0.2030, miou_1.0[0.701635838](-0.506%), miou_1.0[0.711272776](OS=8, -0.526%) 
 $ python train.py --logtostderr --training_number_of_steps=60000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=16 --train_crop_size=769 --train_crop_size=769 --train_batch_size=16 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.001
+
+## frozen graph
+$ python export_model.py --logtostderr --model_variant="mobilenet_v2" --output_stride=16 --crop_size=1025 --crop_size=2049 --checkpoint_path=./datasets/cityscapes/exp/train_on_train_set/0320-backbone/model.ckpt-90000 --export_path=./datasets/cityscapes/frozen_graph_backbone.pb --num_classes=19
 
 ----------------
 # 2019.03.21
@@ -1054,13 +1058,51 @@ $ python train.py --logtostderr --training_number_of_steps=90000 --train_split="
 ## Total number of params: 2582403 = 2.58M
 ## ('FLOPs after freezing: ', 77971802869L) = 77.97G
 ## Inference time: 125.845039368 ms
-$ python train.py --logtostderr --training_number_of_steps=100000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train_onlydecoderv3 --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.01
+$ python train.py --logtostderr --training_number_of_steps=100000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train_onlydecoderv3 --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.01 
 
 # eval
 $ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --output_stride=16 --decoder_output_stride=4 --eval_crop_size=1025 --eval_crop_size=2049 --dataset="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train_onlydecoderv3 --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1 
 
 ## frozen graph
 $ python export_model.py --logtostderr --model_variant="mobilenet_v2" --output_stride=16 --decoder_output_stride=4 --crop_size=1025 --crop_size=2049 --checkpoint_path=./datasets/cityscapes/exp/train_on_train_set/train_onlydecoderv3/model.ckpt-100000 --export_path=./datasets/cityscapes/frozen_graph_onlydecoderv3.pb --num_classes=19
+
+
+------------------
+# 2019.05.10
+## mobilenet_v2, `re-use only the network backbone`		
+## train_batch_size=8, fine_tune_batch_norm=True, base_learning_rate=0.01
+## With `better-ASPP v2` & 'self-attentionv3'
+## checkout `` branch.
+## global step 90000: loss = 0.1812 (0.546 sec/step), miou_1.0[0.7441293]
+## Total number of params: 2989459 = 2.98M
+## ('GFLOPs after freezing: ', 58907371674L) = 58.91G
+## Inference time: 126.140499115 ms
+$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16  --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train_asppv2_samv3 --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.01 --use_self_attention=True --add_image_level_feature=False
+
+# eval
+$ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16  --eval_crop_size=1025 --eval_crop_size=2049 --dataset="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train_asppv2_samv3 --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1 --use_self_attention=True --add_image_level_feature=False
+
+## frozen graph
+$ python export_model.py --logtostderr --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --crop_size=1025 --crop_size=2049 --checkpoint_path=./datasets/cityscapes/exp/train_on_train_set/train_asppv2_samv3/model.ckpt-90000 --export_path=./datasets/cityscapes/frozen_graph_asppv2_samv3.pb --num_classes=19 --use_self_attention=True --add_image_level_feature=False
+
+
+------------------
+# 2019.05.12
+## mobilenet_v2, `re-use only the network backbone`		
+## train_batch_size=8, fine_tune_batch_norm=True, base_learning_rate=0.01
+## With `better-ASPP v2` & 'decoderv3'
+## checkout `` branch.
+## global step 90000: loss = 0.2007 (0.593 sec/step), miou_1.0[0.736852825]
+## Total number of params: 2666947 = 2.67M
+## Inference time: 120.031118393 ms
+## ('FLOPs after freezing: ', 80743816629L) = 80.74G
+$ python train.py --logtostderr --training_number_of_steps=90000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=769 --train_crop_size=769 --train_batch_size=8 --dataset="cityscapes" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/cityscapes/exp/train_on_train_set/train_asppv2_decoderv3 --dataset_dir=./datasets/cityscapes/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.01 --add_image_level_feature=False
+
+# eval
+$ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16  --decoder_output_stride=4 --eval_crop_size=1025 --eval_crop_size=2049 --dataset="cityscapes" --checkpoint_dir=./datasets/cityscapes/exp/train_on_train_set/train_asppv2_decoderv3 --eval_logdir=./datasets/cityscapes/exp/train_on_train_set/eval --dataset_dir=./datasets/cityscapes/tfrecord --max_number_of_iterations=1 --add_image_level_feature=False
+
+## frozen graph
+$ python export_model.py --logtostderr --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --crop_size=1025 --crop_size=2049 --checkpoint_path=./datasets/cityscapes/exp/train_on_train_set/train_asppv2_decoderv3/model.ckpt-90000 --export_path=./datasets/cityscapes/frozen_graph_asppv2_decoderv3.pb --num_classes=19 --add_image_level_feature=False
 
 
 
@@ -1636,10 +1678,37 @@ $ python export_model.py --logtostderr --model_variant="mobilenet_v2" --atrous_r
 ## miou_1.0[0.976282358], class_0_iou[0.987392783], class_1_iou[0.965171933]
 $ python train.py --logtostderr --training_number_of_steps=12000 --train_split="train" --model_variant="mobilenet_v2" --atrous_rates=6 --atrous_rates=12 --atrous_rates=18 --output_stride=16 --decoder_output_stride=4 --train_crop_size=376 --train_crop_size=1243 --train_batch_size=8 --dataset="runway" --tf_initial_checkpoint=./datasets/model_zoo/deeplabv3_mnv2_cityscapes_train/model.ckpt --train_logdir=./datasets/runway/exp/train_on_train_set/train --dataset_dir=./datasets/runway/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.001 --use_self_attention=True
 
------------------
-# 2019.05.06
-## infer czbn_fly
-$ 
+
+----------------
+# 2019.05.11
+## 'deeplabv3_mnv2_cityscapes_train', `re-use only the network backbone` 
+## atrous_rates & train_batch_size=8 & BN=True & --base_learning_rate=0.001
+## self-attention v3
+## global step 12000: loss = 0.1240 (0.318 sec/step), miou_1.0[0.976209044]
+## class_1_iou[0.965301931], class_0_iou[0.987116098]
+## 2nd
+## global step 12000: loss = 0.1267 (0.294 sec/step), miou_1.0[0.97443521]
+## class_0_iou[0.986204922], class_1_iou[0.962665439]
+$ python train.py --logtostderr --training_number_of_steps=12000 --train_split="train" --model_variant="mobilenet_v2" --output_stride=16 --train_crop_size=376 --train_crop_size=1243 --train_batch_size=8 --dataset="runway" --tf_initial_checkpoint=./datasets/runway/exp/train_on_train_set/train/model.ckpt-12000 --train_logdir=./datasets/runway/exp/train_on_train_set/train_samv3 --dataset_dir=./datasets/runway/tfrecord --num_clones=2 --fine_tune_batch_norm=True --initialize_last_layer=False --last_layers_contain_logits_only=False --save_summaries_images=True --base_learning_rate=0.001 --use_self_attention=True --add_image_level_feature=False 
+
+# run eval mobilenet_v2
+# 1st
+## Total number of params: 2900546 = 2.9M
+## ('GFLOPs after freezing: ', 42460399399L) = 42.6G
+## Inference time: 56.0899019241 ms
+# 2nd
+## Total number of params: 2404226 = 2.4M
+## ('GFLOPs after freezing: ', 10885673007L) = 10.88G
+## Inference time: 23.6561059952 ms
+$ python eval.py --logtostderr --eval_split="val" --model_variant="mobilenet_v2" --output_stride=16 --eval_crop_size=376 --eval_crop_size=1243 --dataset="runway" --checkpoint_dir=./datasets/runway/exp/train_on_train_set/train_samv3 --eval_logdir=./datasets/runway/exp/train_on_train_set/eval --dataset_dir=./datasets/runway/tfrecord --max_number_of_iterations=1 --use_self_attention=True --add_image_level_feature=False 
+
+# run vis, mobilenet_v2
+$ python vis.py --logtostderr --vis_split="val" --model_variant="mobilenet_v2"  --output_stride=16 --vis_crop_size=376 --vis_crop_size=1243 --dataset="runway" --colormap_type="kitti_road" --checkpoint_dir=./datasets/runway/exp/train_on_train_set/train_samv3 --vis_logdir=./datasets/runway/exp/train_on_train_set/vis --dataset_dir=./datasets/runway/tfrecord --max_number_of_iterations=1 --use_self_attention=True --add_image_level_feature=False 
+
+# frozen graph
+$ python export_model.py --logtostderr --model_variant="mobilenet_v2" --output_stride=16 --crop_size=376 --crop_size=1243 --checkpoint_path=./datasets/runway/exp/train_on_train_set/train_samv3/model.ckpt-12000 --export_path=./datasets/runway/frozen_graph_sam.pb --num_classes=2 --use_self_attention=True --add_image_level_feature=False 
+
+
 
 ``` 
 
